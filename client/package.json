@@ -10,7 +10,8 @@
     "react": "16.3.1",
     "react-native": "0.55.4",
     "react-native-gifted-chat": "^0.4.3",
-    "react-native-router-flux": "^4.0.0-beta.31"
+    "react-native-router-flux": "^4.0.0-beta.31",
+    "socket.io-client": "^2.1.1"
   },
   "devDependencies": {
     "babel-jest": "23.0.1",
