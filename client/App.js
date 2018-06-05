@@ -11,8 +11,11 @@ import {
 } from 'react-native';
 
 import { GiftedChat } from 'react-native-gifted-chat';
-import Chat from './components/Chat.js';
 import SocketIOClient from 'socket.io-client';
+import { Router, Scene } from 'react-native-router-flux';
+
+import Chat from './components/Chat.js';
+import Home from './components/Home.js';
 
 class App extends Component{
   constructor(props) {
@@ -22,7 +25,20 @@ class App extends Component{
 
   render() {
     return (
-      <Chat/>
+      <Router>
+        <Scene key="root">
+          <Scene key="home"
+            component={Home}
+            title="Home"
+            initial
+          />
+          <Scene
+            key="chat"
+            component={Chat}
+            title="Chat"
+          />
+        </Scene>
+      </Router>
     )
   }
 }

@@ -3,25 +3,20 @@ import React, { Component } from 'react';
 
 class Chat extends React.Component {
   state = {
-    messages: [],
+    messages: [
+      {
+        _id: 1,
+        text: 'Hello developer!!',
+        createdAt: new Date(),
+        user: {
+          _id: 2,
+          name: 'React Native',
+          avatar: 'https://placeimg.com/140/140/any',
+        },
+      },
+    ],
   }
 
-  componentWillMount() {
-    this.setState({
-      messages: [
-        {
-          _id: 1,
-          text: 'Hello developer!!',
-          createdAt: new Date(),
-          user: {
-            _id: 2,
-            name: 'React Native',
-            avatar: 'https://placeimg.com/140/140/any',
-          },
-        },
-      ],
-    })
-  }
 
   onSend(messages = []) {
     this.setState(previousState => ({
