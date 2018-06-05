@@ -1,0 +1,16 @@
+{
+  "name": "medchat-backend",
+  "version": "0.0.0",
+  "description": "Backend for a medchat app",
+  "main": "app.js",
+  "author": "Aleksei Tiulpin",
+  "private": true,
+  "license": "MIT",
+  "dependencies": {
+    "express": "latest",
+    "socket.io": "^2.1.1"
+  },
+  "scripts": {
+    "start": "node app.js"
+  }
+}
