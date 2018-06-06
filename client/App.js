@@ -29,7 +29,7 @@ class App extends Component{
         <Scene key="root">
           <Scene key="home"
             component={Home}
-            title="Home"
+            hideNavBar={true}
             initial
           />
           <Scene
