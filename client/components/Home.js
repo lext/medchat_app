@@ -10,6 +10,8 @@ import {
 
 import { Actions } from 'react-native-router-flux';
 import { YellowBox } from 'react-native';
+import SocketIOClient from 'socket.io-client';
+
 YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTImageLoader']);
 
 
@@ -19,7 +21,8 @@ class Home extends React.Component {
   };
 
   confirmUser() {
-    Actions.chat();
+    this.socket = SocketIOClient('http://localhost:3000');
+    Actions.chatlist();
   };
 
   onChangeText(value) {
