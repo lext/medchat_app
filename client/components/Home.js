@@ -14,20 +14,36 @@ import SocketIOClient from 'socket.io-client';
 
 YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTImageLoader']);
 
-
+const SRV_ADDR="http://localhost:3000"
 
 class Home extends React.Component {
+
   signUp() {
   };
 
   confirmUser() {
-    this.socket = SocketIOClient('http://localhost:3000');
-    Actions.chatlist();
+    // Initializing the socket if it is not yet initialized
+    if (typeof this.socket == "undefined"){
+      this.socket = SocketIOClient(SRV_ADDR);
+      this.socket.connect();
+    }
+    // This should happen if the server will approve the authentication
+    this.socket.on('auth_result', (data)=> {
+      if (data.auth_code == 'OK') {
+          Actions.chatlist();
+      }
+    })
+    // Sending the login and the password
+    this.socket.emit('auth', {username:this.login, pass:this.pass});
+
   };
 
-  onChangeText(value) {
+  onChangeLogin(value) {
+    this.login = value
+  };
 
-
+  onChangePass(value) {
+    this.pass = value
   };
 
   render () {
@@ -37,11 +53,11 @@ class Home extends React.Component {
           <View style={styles.input}>
             <TextInput
               placeholder='Social security number'
-              onChangeText={value => this.onChangeText(value)}
+              onChangeText={value => this.onChangeLogin(value)}
             />
             <TextInput
               placeholder='Password'
-              onChangeText={value => this.onChangeText(value)}
+              onChangeText={value => this.onChangePass(value)}
               secureTextEntry={true}
             />
           </View>

@@ -2,12 +2,12 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-app.get('/', function(req, res){
-    console.log('requested main');
-});
-
 io.on('connection', function(socket){
-  console.log('a user connected');
+  console.log('Client connected');
+  socket.on('auth', (data)=> {
+    console.log(data)
+    socket.emit('auth_result', {auth_code:'OK'})
+  })
 });
 
 http.listen(3000, function(){
