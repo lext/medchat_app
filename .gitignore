@@ -1,5 +1,7 @@
 # Android stuff
 
+srv/database/data/
+
 # built application files
 *.apk
 *.ap_

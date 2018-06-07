@@ -1,2 +1,2 @@
 #! /bin/sh
-docker build --tag mongo_image .
+docker pull mongo
