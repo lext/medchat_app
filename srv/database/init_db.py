@@ -1,4 +1,6 @@
 from pymongo import MongoClient
+import uuid
+import hashlib
 
 if __name__ == "__main__":
     client = MongoClient('mongodb://127.0.0.1:27017')
@@ -109,5 +111,40 @@ if __name__ == "__main__":
     print("Doctors inserted:")
     print("=========================")
     for document in doctors.find({}):
+        print(document)
+    print("=========================")
+
+
+
+    # Patients
+    salts = [uuid.uuid4().hex, uuid.uuid4().hex, uuid.uuid4().hex]
+    print(salts)
+    tmp = [
+        {
+            "person": people.find_one({"Ssn": "221181-289H"})['_id'], # Gordon Freeman
+            "salt": salts[0],
+            "password": hashlib.sha256(salts[0].encode() + "test1".encode()).hexdigest(),
+        },
+        {
+            "person": people.find_one({"Ssn": "150280-89J0"})['_id'], # Alyx Vance
+            "specialization": specialization.find_one({"Name": "PT"})['_id'],
+            "salt": salts[1],
+            "password": hashlib.sha256(salts[1].encode() + "test2".encode()).hexdigest(),
+        },
+        {
+            "person": people.find_one({"Ssn": "090182-9300"})['_id'], # Geralt of Rivia
+            "specialization": specialization.find_one({"Name": "NL"})['_id'],
+            "salt": salts[2],
+            "password": hashlib.sha256(salts[2].encode() + "test3".encode()).hexdigest(),
+
+        }
+    ]
+
+    patients.insert_many(tmp)
+
+    print(' ')
+    print("Patients inserted:")
+    print("=========================")
+    for document in patients.find({}):
         print(document)
     print("=========================")
