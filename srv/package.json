@@ -8,6 +8,7 @@
   "license": "MIT",
   "dependencies": {
     "express": "latest",
+    "mongodb": "^3.0.10",
     "socket.io": "^2.1.1"
   },
   "scripts": {
