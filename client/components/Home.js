@@ -34,7 +34,7 @@ class Home extends React.Component {
       }
     })
     // Sending the login and the password
-    this.socket.emit('auth', {username:this.login, pass:this.pass});
+    this.socket.emit('auth', {ssn:this.login, pass:this.pass});
 
   };
 
