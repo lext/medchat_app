@@ -10,7 +10,7 @@ const url = 'mongodb://localhost:27017';
 
 
 
-const checkUser = function(socket) {
+const registerAuth = function(socket) {
   socket.on('auth', (data)=> {
   MongoClient.connect(url, function(err, client) {
       assert.equal(null, err);
@@ -18,7 +18,7 @@ const checkUser = function(socket) {
       const collection = db.collection("people");
       collection.findOne({"Ssn":data.ssn}, function(err, res) {
         assert.equal(err, null);
-
+        console.log(collection);
         if (data == null){
           socket.emit('auth_result', {auth_code:'FAIL'});
         } else {
@@ -33,7 +33,7 @@ const checkUser = function(socket) {
 
 io.on('connection', function(socket){
     console.log('Client connected');
-    checkUser(socket);
+    registerAuth(socket);
 
 
 });
