@@ -11,6 +11,7 @@ import {
 import { Actions } from 'react-native-router-flux';
 import { YellowBox } from 'react-native';
 import SocketIOClient from 'socket.io-client';
+import { sha256 } from 'react-native-sha256';
 
 YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTImageLoader']);
 
@@ -29,12 +30,20 @@ class Home extends React.Component {
     }
     // This should happen if the server will approve the authentication
     this.socket.on('auth_result', (data)=> {
-      if (data.auth_code == 'OK') {
+      if (data.auth_code == 1) {
           Actions.chatlist();
       }
-    })
+    });
+
+    this.socket.on('auth_salt', (data)=> {
+      console.log(data.salt+this.pass);
+      sha256(data.salt+this.pass).then( hash_res => {
+        this.socket.emit('auth_pass', {ssn:this.login, hash: hash_res});
+      })
+    });
+
     // Sending the login and the password
-    this.socket.emit('auth', {ssn:this.login, pass:this.pass});
+    this.socket.emit('auth_init', {ssn:this.login, pass:this.pass});
 
   };
 

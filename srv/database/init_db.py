@@ -127,13 +127,11 @@ if __name__ == "__main__":
         },
         {
             "person": people.find_one({"Ssn": "150280-89J0"})['_id'], # Alyx Vance
-            "specialization": specialization.find_one({"Name": "PT"})['_id'],
             "salt": salts[1],
             "password": hashlib.sha256(salts[1].encode() + "test2".encode()).hexdigest(),
         },
         {
             "person": people.find_one({"Ssn": "090182-9300"})['_id'], # Geralt of Rivia
-            "specialization": specialization.find_one({"Name": "NL"})['_id'],
             "salt": salts[2],
             "password": hashlib.sha256(salts[2].encode() + "test3".encode()).hexdigest(),
 
