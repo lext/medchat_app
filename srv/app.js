@@ -1,6 +1,9 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+// will be used to store the users
+var patients_arr = {};
+
 require('console-stamp')(console, '[HH:MM:ss.l]');
 
 const mongo = require('mongodb');
@@ -9,8 +12,10 @@ const assert = require('assert');
 const url = 'mongodb://localhost:27017';
 
 
-
 const retrieveAuthUserInfo = function(socket, channel, callback) {
+  /*
+  Authorization callback template. Used to register callbacks on auth_init and auth_salt.
+  */
   socket.on(channel, (client_data)=> {
     MongoClient.connect(url, function(err, client) {
           // Connecting
@@ -60,6 +65,8 @@ const registerAuth = function(socket) {
     } else {
         console.log('Incorrect attempt of authentication for user '+ client_data.ssn +' (passwords don\'t match)');
         socket.emit('auth_result', {auth_code: 0});
+        // Storing the socket for further communication
+        patients_arr[client_data.ssn] = socket;
     }
     client.close();
   });
