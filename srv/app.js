@@ -1,8 +1,11 @@
 var app = require('express')();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+
+var http_srv = require('http').Server(app);
+var io = require('socket.io')(http_srv);
 // will be used to store the users
 var patients_arr = {};
+var doctors_arr = {};
+var chats = {};
 
 require('console-stamp')(console, '[HH:MM:ss.l]');
 
@@ -12,7 +15,7 @@ const assert = require('assert');
 const url = 'mongodb://localhost:27017';
 
 
-const retrieveAuthUserInfo = function(socket, channel, callback) {
+const retrieveAuthUserInfo = function(socket, user_collection, channel, callback) {
   /*
   Authorization callback template. Used to register callbacks on auth_init and auth_salt.
   */
@@ -30,11 +33,11 @@ const retrieveAuthUserInfo = function(socket, channel, callback) {
               console.log('User '+ client_data.ssn + ' not found');
               socket.emit('auth_result', {auth_code: 0});
             } else {
-              db.collection("patients").findOne({"person": new mongo.ObjectId(person._id)}, function(err, patient_data) {
+              db.collection(user_collection).findOne({"person": new mongo.ObjectId(person._id)}, function(err, user_data) {
                 assert.equal(err, null);
-                assert.notEqual(patient_data, null);
+                assert.notEqual(user_data, null);
                 // Calling the callback using the data retrived
-                callback(client, client_data, patient_data);
+                callback(client, client_data, user_data);
               });
             }
         });
@@ -45,30 +48,43 @@ const retrieveAuthUserInfo = function(socket, channel, callback) {
 
 const registerAuth = function(socket) {
   /*
-  1) First, user sends a login to the server on socket <auth_init>
-  2) Then, if such user exists, the user gets its own salt value on socket <auth_salt>
-  3) User computes sha256(pass + salt) and sends it back to the server on channel <auth_pass>
+  1) First, user sends a login to the server on socket <user_type>_auth_init
+  2) Then, if such user exists, the user gets its own salt value on socket <user_type>_auth_salt
+  3) User computes sha256(pass + salt) and sends it back to the server on channel <user_type>auth_pass
   4) If the hashes match, the user gets auth_code=1
 
-  If the user id is not found, the user gets code auth_code=0 - does not exist
+  First letter in the channel name says whether it is a patient or a doctor.
+
+  If the user id is not found, the user gets code ac=0 - does not exist
+
+
 
   */
-  retrieveAuthUserInfo(socket, 'auth_init', function(client, client_data, patient_data) {
-    socket.emit('auth_salt', {salt: patient_data.salt});
-    client.close();
-  });
 
-  retrieveAuthUserInfo(socket, 'auth_pass', function(client, client_data, patient_data) {
-    if (patient_data.password == client_data.hash) {
-        console.log('Password for user '+ client_data.ssn +' is correct');
-        socket.emit('auth_result', {auth_code: 1});
-    } else {
-        console.log('Incorrect attempt of authentication for user '+ client_data.ssn +' (passwords don\'t match)');
-        socket.emit('auth_result', {auth_code: 0});
-        // Storing the socket for further communication
-        patients_arr[client_data.ssn] = socket;
-    }
-    client.close();
+  ['patients', 'doctors'].forEach(function(user_collection){
+    retrieveAuthUserInfo(socket, user_collection, user_collection+'_auth_init', function(client, client_data, user_data) {
+      socket.emit(user_collection+'_auth_salt', {salt: user_data.salt});
+      client.close();
+    });
+
+    retrieveAuthUserInfo(socket, user_collection, user_collection+'_auth_pass', function(client, client_data, user_data) {
+      if (user_data.password == client_data.hash) {
+          console.log('Password for user '+ client_data.ssn +' ['+user_collection+']  is correct');
+          socket.emit('auth_result', {auth_code: 1});
+      } else {
+          console.log('Incorrect attempt of authentication for patient   '+ client_data.ssn +' ['+user_collection+'] (passwords don\'t match)');
+          socket.emit('auth_result', {auth_code: 0});
+          // Storing the socket for further communication
+          if (user_collection == 'patients') {
+            patients_arr[client_data.ssn] = socket;
+          } else {
+            doctors_arr[client_data.ssn] = socket;
+          }
+
+      }
+      client.close();
+    });
+
   });
 };
 
@@ -77,6 +93,6 @@ io.on('connection', function(socket){
     registerAuth(socket);
 });
 
-http.listen(3000, function(){
+http_srv.listen(3000, function(){
   console.log('listening on *:3000');
 });

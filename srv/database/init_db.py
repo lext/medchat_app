@@ -88,20 +88,38 @@ if __name__ == "__main__":
         print(document)
     print("=========================")
 
+    salts = []
+    passwords = []
+    for i in range(6):
+        salt = uuid.uuid4().hex
+        salts.append(salt)
+        passwords.append(hashlib.sha256(salt.encode() + "test{}".format(i+1).encode()).hexdigest())
+
+    print(salts)
+    print(passwords)
+
 
     # Doctors
     tmp = [
         {
             "person": people.find_one({"Ssn": "170975-050J"})['_id'], # Mona Sax
             "specialization": specialization.find_one({"Name": "GP"})['_id'],
+            "salt": salts[0],
+            "password": passwords[0],
         },
         {
             "person": people.find_one({"Ssn": "150280-89J0"})['_id'], # Alyx Vance
             "specialization": specialization.find_one({"Name": "PT"})['_id'],
+            "salt": salts[1],
+            "password": passwords[1],
+
         },
         {
             "person": people.find_one({"Ssn": "090182-9300"})['_id'], # Geralt of Rivia
             "specialization": specialization.find_one({"Name": "NL"})['_id'],
+            "salt": salts[2],
+            "password": passwords[2],
+
         }
     ]
 
@@ -114,26 +132,22 @@ if __name__ == "__main__":
         print(document)
     print("=========================")
 
-
-
     # Patients
-    salts = [uuid.uuid4().hex, uuid.uuid4().hex, uuid.uuid4().hex]
-    print(salts)
     tmp = [
         {
             "person": people.find_one({"Ssn": "221181-289H"})['_id'], # Gordon Freeman
-            "salt": salts[0],
-            "password": hashlib.sha256(salts[0].encode() + "test1".encode()).hexdigest(),
+            "salt": salts[3],
+            "password": passwords[3],
         },
         {
             "person": people.find_one({"Ssn": "150280-89J0"})['_id'], # Alyx Vance
-            "salt": salts[1],
-            "password": hashlib.sha256(salts[1].encode() + "test2".encode()).hexdigest(),
+            "salt": salts[4],
+            "password": passwords[4],
         },
         {
             "person": people.find_one({"Ssn": "090182-9300"})['_id'], # Geralt of Rivia
-            "salt": salts[2],
-            "password": hashlib.sha256(salts[2].encode() + "test3".encode()).hexdigest(),
+            "salt": salts[5],
+            "password": passwords[5],
 
         }
     ]

@@ -15,17 +15,14 @@ import { sha256 } from 'react-native-sha256';
 
 YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTImageLoader']);
 
-const SRV_ADDR="http://localhost:3000"
+const SRV_ADDR="http://localhost:5000"
 
 class Home extends React.Component {
-
-  signUp() {
-  };
 
   confirmUser() {
     // Initializing the socket if it is not yet initialized
     if (typeof this.socket == "undefined"){
-      this.socket = SocketIOClient(SRV_ADDR);
+      this.socket = SocketIOClient('http://localhost:3000');
       this.socket.connect();
     }
     // This should happen if the server will approve the authentication
@@ -35,15 +32,14 @@ class Home extends React.Component {
       }
     });
 
-    this.socket.on('auth_salt', (data)=> {
-      console.log(data.salt+this.pass);
+    this.socket.on('patients_auth_salt', (data)=> {
       sha256(data.salt+this.pass).then( hash_res => {
-        this.socket.emit('auth_pass', {ssn:this.login, hash: hash_res});
+        this.socket.emit('patients_auth_pass', {ssn:this.login, hash: hash_res});
       })
     });
 
     // Sending the login and the password
-    this.socket.emit('auth_init', {ssn:this.login, pass:this.pass});
+    this.socket.emit('patients_auth_init', {ssn:this.login, pass:this.pass});
 
   };
 
