@@ -3,11 +3,14 @@ import { ChatFeed, Message } from 'react-chat-ui'
 import {
     ListGroup,
     ListGroupItem,
+    InputGroup,
+    InputGroupAddon,
     Label,
     Input,
     Container,
     Row,
     Col,
+    Button
 } from 'reactstrap';
 
 class Chat extends Component {
@@ -27,7 +30,7 @@ class Chat extends Component {
         {name:'123', ssn:'123123'},
         {name:'123', ssn:'123123'},
         {name:'123', ssn:'123123'},
-        
+
       ],
     };
   }
@@ -54,7 +57,18 @@ class Chat extends Component {
               />
           </Col>
         </Row>
+        <Row>
+          <Col>
+          <InputGroup>
+            <Input placeholder="Type here..." />
+            <InputGroupAddon addonType="append">
+              <Button color="primary" >Send</Button>
+            </InputGroupAddon>
+          </InputGroup>
+          </Col>
+        </Row>
       </Container>
+
     )
   }
 
