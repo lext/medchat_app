@@ -53,6 +53,7 @@ const retrieveAuthUserInfo = function(socket, user_collection, channel, callback
 
 const registerAuth = function(socket) {
   /*
+  
   1) First, user sends a login to the server on socket <user_type>_auth_init
   2) Then, if such user exists, the user gets its own salt value on socket <user_type>_auth_salt
   3) User computes sha256(pass + salt) and sends it back to the server on channel <user_type>auth_pass
@@ -73,9 +74,6 @@ const registerAuth = function(socket) {
     });
 
     retrieveAuthUserInfo(socket, user_collection, user_collection+'_auth_pass', function(client, client_data, user_data) {
-      console.log(user_data.password);
-      console.log(client_data.hash);
-
       if (user_data.password == client_data.hash) {
           console.log('Password for user '+ client_data.ssn +' ['+user_collection+']  is correct');
           socket.emit('auth_result', {ssn: client_data.ssn, auth_code: 1});
@@ -97,8 +95,8 @@ const registerAuth = function(socket) {
 };
 
 io.on('connection', function(socket){
-    console.log('Client connected');
-    registerAuth(socket);
+  console.log('Client connected');
+  registerAuth(socket);
 });
 
 http_srv.listen(3000, function(){
