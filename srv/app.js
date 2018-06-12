@@ -35,9 +35,14 @@ const retrieveAuthUserInfo = function(socket, user_collection, channel, callback
             } else {
               db.collection(user_collection).findOne({"person": new mongo.ObjectId(person._id)}, function(err, user_data) {
                 assert.equal(err, null);
-                assert.notEqual(user_data, null);
                 // Calling the callback using the data retrived
-                callback(client, client_data, user_data);
+                if (user_data == null) {
+                    console.log('Incorrect attempt of authentication for patient   '+ client_data.ssn +' ['+user_collection+'] (user is not in the collection)');
+                    socket.emit('auth_result', {auth_code: 0});
+                }
+                else {
+                  callback(client, client_data, user_data);
+                }
               });
             }
         });
@@ -63,17 +68,20 @@ const registerAuth = function(socket) {
 
   ['patients', 'doctors'].forEach(function(user_collection){
     retrieveAuthUserInfo(socket, user_collection, user_collection+'_auth_init', function(client, client_data, user_data) {
-      socket.emit(user_collection+'_auth_salt', {salt: user_data.salt});
+      socket.emit(user_collection+'_auth_salt', {ssn: client_data.ssn, salt: user_data.salt});
       client.close();
     });
 
     retrieveAuthUserInfo(socket, user_collection, user_collection+'_auth_pass', function(client, client_data, user_data) {
+      console.log(user_data.password);
+      console.log(client_data.hash);
+
       if (user_data.password == client_data.hash) {
           console.log('Password for user '+ client_data.ssn +' ['+user_collection+']  is correct');
-          socket.emit('auth_result', {auth_code: 1});
+          socket.emit('auth_result', {ssn: client_data.ssn, auth_code: 1});
       } else {
           console.log('Incorrect attempt of authentication for patient   '+ client_data.ssn +' ['+user_collection+'] (passwords don\'t match)');
-          socket.emit('auth_result', {auth_code: 0});
+          socket.emit('auth_result', {ssn: client_data.ssn, auth_code: 0});
           // Storing the socket for further communication
           if (user_collection == 'patients') {
             patients_arr[client_data.ssn] = socket;

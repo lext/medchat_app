@@ -8,34 +8,45 @@ import {
     Col,
 } from 'reactstrap';
 import openSocket from 'socket.io-client';
-var hashjs = require('hash.js');
-
+//var hashjs = require('hash.js');
+var CryptoJS = require("crypto-js");
 
 class App extends Component {
   constructor() {
     super()
 
     this.state = {
-      endpoint: "http://localhost:3000" // this is where we are connecting to with sockets
+      credentials:{
+        password: null,
+        ssn: null
+      }
     };
     console.log('Called constructor')
   }
 
   authUser(){
-      const  socket = openSocket(this.state.endpoint);
+      const  socket = openSocket("http://localhost:3000");
+      const state = this.state;
       socket.on('doctors_auth_salt', function(client_data){
-          const hashpass = hashjs.sha256(client_data.salt+this.password).update().digest('hex');
-          socket.emit('doctors_auth_pass', {password:hashpass})
+          console.log(client_data.salt+state.credentials.password);
+          const hashpass = CryptoJS.SHA256(client_data.salt+state.credentials.password).toString(CryptoJS.enc.Hex);
+          const to_send= {ssn: state.credentials.ssn, hash:hashpass};
+          socket.emit('doctors_auth_pass', to_send)
       });
 
       socket.on('auth_result', function(client_data){
-          console.log('Auth_result');
-          console.log(client_data);
+        console.log(client_data);
       });
-      console.log(this.ssn);
-      socket.emit('doctors_auth_init', {ssn:this.ssn});
+
+      socket.emit('doctors_auth_init', {ssn:this.state.credentials.ssn});
   }
 
+
+  handleChange(e){
+    const state = this.state;
+    state.credentials[e.target.name] = e.target.value;
+    this.setState(state);
+  }
   render() {
     return (
       <Container>
@@ -48,10 +59,10 @@ class App extends Component {
       <Row>
         <Col/>
         <Col>
-            <Label for="SSN">Social security number</Label>
-            <Input id="SSN" onChange={(e) => this.ssn=`${e.target.value}`} placeholder="Enter your SSN here" />
+            <Label for="ssn">Social security number</Label>
+            <Input name="ssn" onChange={this.handleChange.bind(this)} placeholder="Enter your SSN here" />
             <Label for="password">Password</Label>
-            <Input type="password" id="password" onChange={(e) => this.password=`${e.target.value}`} placeholder="Enter your password here" />
+            <Input type="password" name="password" onChange={this.handleChange.bind(this)} placeholder="Enter your password here" />
             <Button type="submit" color="primary" onClick={this.authUser.bind(this)}>Submit</Button>
           </Col>
           <Col/>
