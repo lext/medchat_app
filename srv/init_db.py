@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 import uuid
 import hashlib
-
+from bson.objectid import ObjectId
 if __name__ == "__main__":
     client = MongoClient('mongodb://127.0.0.1:27017')
 #    try:
@@ -15,7 +15,7 @@ if __name__ == "__main__":
     doctors = medchat_db["doctors"]
     patients = medchat_db["patients"]
     specialization = medchat_db["specialization"]
-
+    appointments = medchat_db["appointments"]
     # Fake data (people)
     tmp = [
         {
@@ -158,5 +158,53 @@ if __name__ == "__main__":
     print("Patients inserted:")
     print("=========================")
     for document in patients.find({}):
+        print(document)
+    print("=========================")
+
+
+    # Appointments (conversations)
+    tmp = [
+        {
+            "doctor": doctors.find_one({'person':ObjectId(people.find_one({"Ssn": "150280-89J0"})['_id'])})['_id'], # Alyx Vance
+            "patient": patients.find_one({'person':ObjectId(people.find_one({"Ssn": "221181-289H"})['_id'])})['_id'], # Gordon Freeman
+            "is_happening": True,
+
+        },
+        {
+            "doctor": doctors.find_one({'person':ObjectId(people.find_one({"Ssn": "150280-89J0"})['_id'])})['_id'], # Alyx Vance
+            "patient": patients.find_one({'person':ObjectId(people.find_one({"Ssn": "221181-289H"})['_id'])})['_id'], # Gordon Freeman
+            "is_happening": False,
+        },
+        {
+            "doctor": doctors.find_one({'person':ObjectId(people.find_one({"Ssn": "150280-89J0"})['_id'])})['_id'], # Alyx Vance
+            "patient": patients.find_one({'person':ObjectId(people.find_one({"Ssn": "221181-289H"})['_id'])})['_id'], # Gordon Freeman
+            "is_happening": False,
+
+        },
+        {
+            "doctor": doctors.find_one({'person':ObjectId(people.find_one({"Ssn": "090182-9300"})['_id'])})['_id'], # Geralt of Rivia
+            "patient": patients.find_one({'person':ObjectId(people.find_one({"Ssn": "150280-89J0"})['_id'])})['_id'], # # Alyx Vance
+            "is_happening": True,
+
+        },
+        {
+            "doctor": doctors.find_one({'person':ObjectId(people.find_one({"Ssn": "090182-9300"})['_id'])})['_id'], # Geralt of Rivia
+            "patient": patients.find_one({'person':ObjectId(people.find_one({"Ssn": "221181-289H"})['_id'])})['_id'], # cGeralt of Rivia
+            "is_happening": False,
+        },
+        {
+            "doctor": doctors.find_one({'person':ObjectId(people.find_one({"Ssn": "090182-9300"})['_id'])})['_id'], # Alyx Vance
+            "patient": patients.find_one({'person':ObjectId(people.find_one({"Ssn": "221181-289H"})['_id'])})['_id'], # Gordon Freeman
+            "is_happening": False,
+
+        }
+    ]
+
+    appointments.insert_many(tmp)
+
+    print(' ')
+    print("Appointments inserted:")
+    print("=========================")
+    for document in appointments.find({}):
         print(document)
     print("=========================")
