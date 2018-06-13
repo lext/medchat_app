@@ -2,12 +2,11 @@ var app = require('express')();
 
 var http_srv = require('http').Server(app);
 var io = require('socket.io')(http_srv);
-const crypto = require('crypto');
 // will be used to store the users
 var patients_arr = {};
 var doctors_arr = {};
 var chats = {};
-const cipher = crypto.createCipher('aes192', 'a password');
+
 
 require('console-stamp')(console, '[HH:MM:ss.l]');
 
@@ -43,7 +42,7 @@ const retrieveAuthUserInfo = function(socket, user_collection, channel, callback
                     socket.emit('auth_result', {auth_code: 0});
                 }
                 else {
-                  callback(client, client_data, user_data);
+                  callback(client, client_data, user_data, db);
                 }
               });
             }
@@ -65,35 +64,66 @@ const registerAuth = function(socket) {
 
   If the user id is not found, the user gets code ac=0 - does not exist
 
-
-
   */
 
   ['patients', 'doctors'].forEach(function(user_collection){
-    retrieveAuthUserInfo(socket, user_collection, user_collection+'_auth_init', function(client, client_data, user_data) {
+    retrieveAuthUserInfo(socket, user_collection, user_collection+'_auth_init', function(client, client_data, user_data, db) {
       socket.emit(user_collection+'_auth_salt', {ssn: client_data.ssn, salt: user_data.salt});
       client.close();
     });
 
-    retrieveAuthUserInfo(socket, user_collection, user_collection+'_auth_pass', function(client, client_data, user_data) {
+    retrieveAuthUserInfo(socket, user_collection, user_collection+'_auth_pass', function(client, client_data, user_data, db) {
       if (user_data.password == client_data.hash) {
-          console.log('Password for user '+ client_data.ssn +' ['+user_collection+']  is correct');
-          socket.emit('auth_result', {ssn: client_data.ssn, auth_code: 1});
-      } else {
-          console.log('Incorrect attempt of authentication for patient   '+ client_data.ssn +' ['+user_collection+'] (passwords don\'t match)');
           const api_key = require('node-uuid')();
-          socket.emit('auth_result', {api:api_key, auth_code: 0});
+          console.log('Password for user '+ client_data.ssn +' ['+user_collection+']  is correct');
+          socket.emit('auth_result', {ssn: client_data.ssn, auth_code: 1, user_id:user_data._id, api_key:api_key});
           // Storing the socket for further communication
           if (user_collection == 'patients') {
-            patients_arr[user_data._id] = {sock:socket, api_key:api_key};
+            patients_arr[user_data._id] = {api_key:api_key, user_id:user_data._id};
           } else {
-            doctors_arr[user_data._id] = {sock:socket, api_key:api_key};
+              // Requesting the personal doctor data
+              const doc_data = user_data;
+              db.collection("people").findOne({"_id":new mongo.ObjectId(doc_data.person)}, function(err, person_data) {
+                assert.equal(err, null);
+                // Requesting specialization
+                console.log('Obtained thepersonal data for doctor'+ client_data.ssn);
+                db.collection("specialization").findOne({"_id":new mongo.ObjectId(doc_data.specialization)}, function(err, spec_data) {
+                  assert.equal(err, null);
+                  // When everything is found, we cache it
+                  console.log('Specialization '+ client_data.ssn +' ['+user_collection+']');
+                  doctors_arr[doc_data._id] = {api_key:api_key, user_id:doc_data._id, name:person_data.Name, ssn:person_data.Ssn, specialization:spec_data.Name};
+                  client.close();
+                });
+              });
           }
 
+      } else {
+          console.log('Incorrect attempt of authentication for patient   '+ client_data.ssn +' ['+user_collection+'] (passwords don\'t match)');
+          socket.emit('auth_result', {auth_code: 0});
       }
-      client.close();
+
     });
 
+  });
+};
+
+
+const sendUserList = function(socket) {
+  socket.on('doc_request_patients', (client_data)=>{
+    MongoClient.connect(url, function(err, client) {
+          // Connecting
+          assert.equal(null, err);
+          const db = client.db("medchat");
+          if (doctors_arr[client_data.user_id].api_key === client_data.api_key) {
+              db.collection("appointments").find({"doctor":new mongo.ObjectId(client_data.user_id)}).toArray(function(err, result) {
+                assert.equal(err, null);
+                console.log(result);
+              });
+          } else {
+            // TODO
+          }
+          client.close();
+    });
   });
 };
 
@@ -101,6 +131,7 @@ io.on('connection', function(socket){
   console.log(process.env.MONGODB_HOST);
   console.log('Client connected');
   registerAuth(socket);
+  sendUserList(socket);
 });
 
 http_srv.listen(3000, '0.0.0.0', function(){

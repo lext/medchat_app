@@ -11,15 +11,16 @@ class App extends Component {
     super()
 
     const state = {
-      display_current: 'CHAT',
-      api_key:null
+      display_current: 'AUTH',
+      api_key:null,
+      user_id:null
     };
 
     this.state = state;
   }
   handleAuth(auth_result){
     if (auth_result.auth_code === 1) {
-      this.setState({display_current:'CHAT', api_key: auth_result.api_key});
+      this.setState({display_current:'CHAT', api_key: auth_result.api_key, user_id:auth_result.user_id});
     }
   }
 
@@ -28,7 +29,7 @@ class App extends Component {
       case 'AUTH':
         return <Auth auth_callback={this.handleAuth.bind(this)} />;
       case 'CHAT':
-        return <Chat />;
+        return <Chat api_key={this.state.api_key} user_id={this.state.user_id}/>;
       default:
         return <Auth auth_callback={this.handleAuth.bind(this)}/>;
     }

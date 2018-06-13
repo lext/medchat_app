@@ -11,10 +11,11 @@ import {
     Col,
     Button
 } from 'reactstrap';
+import openSocket from 'socket.io-client';
 
 class Chat extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       is_typing:false,
       font_size:20,
@@ -36,7 +37,17 @@ class Chat extends Component {
         {name:'123', ssn:'123172sds38423'},
 
       ],
+      api_key:props.api_key,
+      user_id:props.user_id
     };
+    this.retrieveUsers();
+  }
+
+  retrieveUsers(){
+      const socket = openSocket("http://localhost:3000");
+      const state = this.state;
+      const to_send =  {api_key:state.api_key, user_id:state.user_id};
+      socket.emit('doc_request_patients',to_send);
   }
 
   render() {
@@ -45,7 +56,7 @@ class Chat extends Component {
       <Container >
         <Row>
           <Col xs={{size:3}} style={{height:"70vh"}}>
-          <h5> Patients List:</h5> 
+          <h5> Patients List:</h5>
             <ListGroup>
               {patients.map(function(patient, index){
                 return <ListGroupItem key={patient.ssn} >{patient.name} / {patient.ssn}</ListGroupItem>
