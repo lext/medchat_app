@@ -5,7 +5,6 @@ import {
     ListGroupItem,
     InputGroup,
     InputGroupAddon,
-    Label,
     Input,
     Container,
     Row,
@@ -26,10 +25,10 @@ class Chat extends Component {
       ],
       patients: [
         {name:'123', ssn:'123123'},
-        {name:'123', ssn:'123123'},
-        {name:'123', ssn:'123123'},
-        {name:'123', ssn:'123123'},
-        {name:'123', ssn:'123123'},
+        {name:'123', ssn:'1231s23'},
+        {name:'123', ssn:'1231d23'},
+        {name:'123', ssn:'123dd123'},
+        {name:'123', ssn:'12317238423'},
 
       ],
     };
@@ -43,7 +42,7 @@ class Chat extends Component {
           <Col xs={{size:3}}>
             <ListGroup>
               {patients.map(function(patient, index){
-                return <ListGroupItem>{patient.name} / {patient.ssn}</ListGroupItem>
+                return <ListGroupItem key={patient.ssn} >{patient.name} / {patient.ssn}</ListGroupItem>
               })}
             </ListGroup>
           </Col>

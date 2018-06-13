@@ -1,9 +1,9 @@
 FROM node:carbon
 
 WORKDIR /usr/src/app
-COPY package*.json ./
-RUN npm install
-COPY app.js .
+COPY package.json ./
+COPY package-lock.json ./
 
-EXPOSE 3000
-CMD [ "npm", "start" ]
+RUN echo $PWD
+RUN npm install
+RUN npm install -g nodemon

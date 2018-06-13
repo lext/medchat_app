@@ -13,6 +13,6 @@
     "socket.io": "^2.1.1"
   },
   "scripts": {
-    "start": "node app.js"
+    "start": "nodemon app.js"
   }
 }

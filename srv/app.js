@@ -12,7 +12,7 @@ require('console-stamp')(console, '[HH:MM:ss.l]');
 const mongo = require('mongodb');
 const MongoClient = mongo.MongoClient;
 const assert = require('assert');
-const url = 'mongodb://localhost:27017';
+const url = 'mongodb://db:27017';
 
 
 const retrieveAuthUserInfo = function(socket, user_collection, channel, callback) {
@@ -53,7 +53,7 @@ const retrieveAuthUserInfo = function(socket, user_collection, channel, callback
 
 const registerAuth = function(socket) {
   /*
-  
+
   1) First, user sends a login to the server on socket <user_type>_auth_init
   2) Then, if such user exists, the user gets its own salt value on socket <user_type>_auth_salt
   3) User computes sha256(pass + salt) and sends it back to the server on channel <user_type>auth_pass
@@ -95,10 +95,11 @@ const registerAuth = function(socket) {
 };
 
 io.on('connection', function(socket){
+  console.log(process.env.MONGODB_HOST);
   console.log('Client connected');
   registerAuth(socket);
 });
 
-http_srv.listen(3000, function(){
-  console.log('listening on *:3000');
+http_srv.listen(3000, '0.0.0.0', function(){
+  console.log('listening on 0.0.0.0:3000');
 });

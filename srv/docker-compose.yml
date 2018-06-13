@@ -1,16 +1,24 @@
 version: "3"
 services:
   db:
+    container_name: "medchat_db"
     image: mongo
     ports:
-      - "27017:27017"
+      - "0.0.0.0:27017:27017"
     volumes:
         - $PWD/database/:/data/db
   srv:
+    container_name: "medchat_server"
     build: .
     volumes:
-      - $PWD:/user/src/app/
+      - .:/usr/src/app/
+      - /usr/src/app/node_modules
     ports:
-      - "8000:8000"
+      - "127.0.0.1:3000:3000"
     depends_on:
       - db
+    links:
+      - "db"
+    environment:
+      MONGODB_HOST: db
+    command: npm start

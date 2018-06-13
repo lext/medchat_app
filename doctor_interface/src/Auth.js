@@ -27,7 +27,6 @@ class Auth extends Component {
       const state = this.state;
       const props = this.props;
       socket.on('doctors_auth_salt', function(client_data){
-          console.log(client_data.salt+state.credentials.password);
           const hashpass = CryptoJS.SHA256(client_data.salt+state.credentials.password).toString(CryptoJS.enc.Hex);
           const to_send= {ssn: state.credentials.ssn, hash:hashpass};
           socket.emit('doctors_auth_pass', to_send)
