@@ -7,3 +7,4 @@ COPY package-lock.json ./
 RUN echo $PWD
 RUN npm install
 RUN npm install -g nodemon
+RUN npm install --save node-uuid

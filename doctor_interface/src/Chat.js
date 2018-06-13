@@ -19,7 +19,7 @@ class Chat extends Component {
       is_typing:false,
       font_size:20,
       messages: [
-        new Message({id: 1, message: "I'm the recipient! (The person you're talking to)",}), // Gray bubble
+        new Message({id: 1, name:'Patient0', message: "I'm the recipient! (The person you're talking to)",}), // Gray bubble
         new Message({id: 1, message: "I'm the recipient! (The person you're talking to)",}), // Gray bubble
         new Message({id: 0, message: "I'm you -- the blue bubble!" }), // Blue bubble
       ],
@@ -29,6 +29,11 @@ class Chat extends Component {
         {name:'123', ssn:'1231d23'},
         {name:'123', ssn:'123dd123'},
         {name:'123', ssn:'12317238423'},
+        {name:'123', ssn:'1231s23'},
+        {name:'123', ssn:'1231fsas23'},
+        {name:'123', ssn:'1231dasdawe23'},
+        {name:'123', ssn:'123dd12asd3'},
+        {name:'123', ssn:'123172sds38423'},
 
       ],
     };
@@ -37,9 +42,10 @@ class Chat extends Component {
   render() {
     const patients = this.state.patients;
     return(
-      <Container>
+      <Container >
         <Row>
-          <Col xs={{size:3}}>
+          <Col xs={{size:3}} style={{height:"70vh"}}>
+          <h5> Patients List:</h5> 
             <ListGroup>
               {patients.map(function(patient, index){
                 return <ListGroupItem key={patient.ssn} >{patient.name} / {patient.ssn}</ListGroupItem>
@@ -58,7 +64,7 @@ class Chat extends Component {
         </Row>
         <Row>
           <Col>
-          <InputGroup>
+          <InputGroup style={{paddingTop:20}}>
             <Input placeholder="Type here..." />
             <InputGroupAddon addonType="append">
               <Button color="primary" >Send</Button>

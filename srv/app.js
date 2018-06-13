@@ -2,10 +2,12 @@ var app = require('express')();
 
 var http_srv = require('http').Server(app);
 var io = require('socket.io')(http_srv);
+const crypto = require('crypto');
 // will be used to store the users
 var patients_arr = {};
 var doctors_arr = {};
 var chats = {};
+const cipher = crypto.createCipher('aes192', 'a password');
 
 require('console-stamp')(console, '[HH:MM:ss.l]');
 
@@ -79,12 +81,13 @@ const registerAuth = function(socket) {
           socket.emit('auth_result', {ssn: client_data.ssn, auth_code: 1});
       } else {
           console.log('Incorrect attempt of authentication for patient   '+ client_data.ssn +' ['+user_collection+'] (passwords don\'t match)');
-          socket.emit('auth_result', {ssn: client_data.ssn, auth_code: 0});
+          const api_key = require('node-uuid')();
+          socket.emit('auth_result', {api:api_key, auth_code: 0});
           // Storing the socket for further communication
           if (user_collection == 'patients') {
-            patients_arr[client_data.ssn] = socket;
+            patients_arr[user_data._id] = {sock:socket, api_key:api_key};
           } else {
-            doctors_arr[client_data.ssn] = socket;
+            doctors_arr[user_data._id] = {sock:socket, api_key:api_key};
           }
 
       }
