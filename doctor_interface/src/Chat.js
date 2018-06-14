@@ -23,13 +23,15 @@ class Chat extends Component {
       patients: [],
       api_key:props.api_key,
       user_id:props.user_id,
-      selected:null,
-      msg_socket:props.msg_socket
+      selected:undefined,
+      msg_socket:props.msg_socket,
+      curr_msg:undefined
     };
     this.retrieveUsers();
     this.handleUserChage = this.handleUserChage.bind(this);
     this.handleMessageSend = this.handleMessageSend.bind(this);
     this.renderChat = this.renderChat.bind(this);
+    this.onChangeInput = this.onChangeInput.bind(this);
     //registering the callback on receiving the new message
     const component = this;
     this.state.msg_socket.on('doc_receive_message', function(msg){
@@ -73,9 +75,8 @@ class Chat extends Component {
 
   handleMessageSend(e) {
     e.preventDefault();
-
     const state = this.state;
-
+    console.log(state.curr_msg)
     const pat_index = state.selected;
     const patient = state.patients[pat_index];
     if (typeof patient === "undefined") return;
@@ -112,6 +113,12 @@ class Chat extends Component {
     return null;
   }
 
+  onChangeInput(e){
+    e.preventDefault();
+    var cur_state = this.state;
+    cur_state.curr_msg = e.target.value;
+    this.setState(cur_state);
+  }
 
   render() {
     const patients = this.state.patients;
@@ -159,7 +166,7 @@ class Chat extends Component {
         <Row>
           <Col>
           <InputGroup style={{paddingTop:20}}>
-            <Input placeholder="Type here..." />
+            <Input name="msg_input" onChange={this.onChangeInput} placeholder="Type here..." />
             <InputGroupAddon addonType="append">
               <Button color="primary" onClick={this.handleMessageSend}>Send</Button>
             </InputGroupAddon>
