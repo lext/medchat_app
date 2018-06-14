@@ -15,14 +15,14 @@ import { sha256 } from 'react-native-sha256';
 
 YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTImageLoader']);
 
-const SRV_ADDR="http://localhost:5000"
 
 class Home extends React.Component {
 
   confirmUser() {
     // Initializing the socket if it is not yet initialized
     if (typeof this.socket == "undefined"){
-      this.socket = SocketIOClient('http://localhost:3000');
+      console.log('Trying to connect to the server')
+      this.socket = SocketIOClient("http://lext-devbox:3000");
       this.socket.connect();
     }
     // This should happen if the server will approve the authentication

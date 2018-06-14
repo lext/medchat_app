@@ -151,12 +151,20 @@ const sendUserList = function(socket) {
   };
 
 io.on('connection', function(socket){
-  console.log(process.env.MONGODB_HOST);
   console.log('Client connected');
   registerAuth(socket);
   sendUserList(socket);
 });
 
-http_srv.listen(3000, '0.0.0.0', function(){
+app.get('/test', function(req, res){
+  res.send('hello world');
+});
+
+
+http_srv.listen(3000, '0.0.0.0', function(err){
+  if (err) {
+    console.log(err);
+    return;
+  }
   console.log('listening on 0.0.0.0:3000');
 });
