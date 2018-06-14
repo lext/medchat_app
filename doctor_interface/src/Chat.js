@@ -18,7 +18,7 @@ class Chat extends Component {
     super(props);
     this.state = {
       is_typing:false,
-      font_size:20,
+      font_size:17,
       messages: {},
       patients: [],
       api_key:props.api_key,
@@ -96,6 +96,17 @@ class Chat extends Component {
           hasInputField={false} // Boolean: use our input, or use your own
           showSenderName // show the name of the user who sent the message
           bubblesCentered={false}
+          bubbleStyles={
+            {
+              text: {
+                fontSize: this.state.font_size
+              },
+              chatbubble: {
+                borderRadius: 20,
+                padding: 7
+              }
+            }
+          }
         />;
     };
     return null;
@@ -140,7 +151,9 @@ class Chat extends Component {
           </Col>
           <Col>
             <h5> Chat feed:</h5>
-            {this.renderChat(msg_display)}
+            <div style={{overflowY:'scroll', height:'700px', display:'flex', flexDirection:'column-reverse'}}>
+              {this.renderChat(msg_display)}
+            </div>
           </Col>
         </Row>
         <Row>
