@@ -155,9 +155,16 @@ const sendUserList = function(socket) {
 const receiveMessage = function (socket){
     socket.on('srv_receive_message_doc', (client_data)=>{
       const pat_socket = client_data[client_data.pat_id];
-      socket.emit('doc_receive_message', client_data);
+      var processed_msg = {from:client_data.doc_id,
+        doc_id:client_data.doc_id,
+        patient_id:client_data.patient_id,
+        text:client_data.text,
+        appointment_id:client_data.appointment_id
+      };
+      // TODO: translate, save, send
+      socket.emit('doc_receive_message', processed_msg );
       // We should use the translator here
-      if (typeof pat_socket !== "undefined") pat_socket.emit('pat_receive_message', client_data);
+      if (typeof pat_socket !== "undefined") pat_socket.emit('pat_receive_message', processed_msg);
       console.log('MSG Received from doctor and send to client ' + '[' + client_data.doc_id + '] '+ '[' + client_data.patient_id + '] ');
     });
 

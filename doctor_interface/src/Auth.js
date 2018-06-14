@@ -33,7 +33,7 @@ class Auth extends Component {
       });
 
       socket.on('auth_result', function(client_data){
-        props.auth_callback(client_data);
+        props.auth_callback(socket, client_data);
       });
 
       socket.emit('doctors_auth_init', {ssn:this.state.credentials.ssn});
