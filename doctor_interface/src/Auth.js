@@ -16,14 +16,14 @@ class Auth extends Component {
 
     this.state = {
       credentials:{
-        password: null,
-        ssn: null
+        password: "test2",
+        ssn: "150280-89J0"
       }
     };
   }
 
   authUser(){
-      const socket = openSocket("http://localhost:3000");
+      const socket = openSocket("http://lext-devbox:3000");
       const state = this.state;
       const props = this.props;
       socket.on('doctors_auth_salt', function(client_data){

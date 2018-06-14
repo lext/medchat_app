@@ -126,15 +126,18 @@ const sendUserList = function(socket) {
               processAppointments(appointments_list, db, async function(appointment, db){
                 const patient_data = await db.collection("patients").findOne({"_id": new mongo.ObjectId(appointment.patient)});
                 const person = await db.collection("people").findOne({"_id": new mongo.ObjectId(patient_data.person)});
+                //const conversation = await db.collection("messages").find({"conversation": new mongo.ObjectId(appointments._id)}).toArray();
                 const res = {patient_id:appointment.patient,
                             patient_name:person.Name,
                             patient_surname:person.Surname,
                             patient_ssn:person.Ssn,
                             patient_sex:person.Sex,
                             appointment_happening:appointment.is_happening,
-                            appointment_id:appointment._id};
+                            appointment_id:appointment._id,
+                            message_history:[]};
                 return res;
               }).then(function(result){
+                  console.log(result);
                   socket.emit('doc_receive_patients', {err:0, patients_list:result});
                   console.log('Patients list has been seend to the doctor');
                   client.close();
@@ -148,12 +151,19 @@ const sendUserList = function(socket) {
             client.close();
           }
         });
-  };
+};
+
+const receiveMessage = function (socket){
+    socket.on('srv_receive_message_doc', async (client_data)=>{
+      console.log(client_data);
+    });
+}
 
 io.on('connection', function(socket){
   console.log('Client connected');
   registerAuth(socket);
   sendUserList(socket);
+  receiveMessage(socket);
 });
 
 app.get('/test', function(req, res){
