@@ -91,7 +91,7 @@ const registerAuth = function(socket) {
                   assert.equal(err, null);
                   // When everything is found, we cache it
                   console.log('Specialization '+ client_data.ssn +' ['+user_collection+']');
-                  doctors_arr[doc_data._id] = {api_key:api_key, user_id:doc_data._id, name:person_data.Name, ssn:person_data.Ssn, specialization:spec_data.Name};
+                  doctors_arr[doc_data._id] = {api_key:api_key, user_id:doc_data._id, name:person_data.Name, surname:person_data.Name, ssn:person_data.Ssn, specialization:spec_data.Name};
                   client.close();
                 });
               });
@@ -107,25 +107,48 @@ const registerAuth = function(socket) {
   });
 };
 
+async function processAppointments(appointments, db, fn) {
+    let results = [];
+    for (let i = 0; i < appointments.length; i++) {
+        let r = await fn(appointments[i], db);
+        results.push(r);
+    }
+    return results;
+};
 
 const sendUserList = function(socket) {
-  socket.on('doc_request_patients', (client_data)=>{
-    MongoClient.connect(url, function(err, client) {
+  socket.on('doc_request_patients', async (client_data)=>{
           // Connecting
-          assert.equal(null, err);
+          const client = await MongoClient.connect(url);
           const db = client.db("medchat");
           if (doctors_arr[client_data.user_id].api_key === client_data.api_key) {
-              db.collection("appointments").find({"doctor":new mongo.ObjectId(client_data.user_id)}).toArray(function(err, result) {
-                assert.equal(err, null);
-                console.log(result);
+              const appointments_list = await db.collection("appointments").find({"doctor":new mongo.ObjectId(client_data.user_id)}).toArray();
+              processAppointments(appointments_list, db, async function(appointment, db){
+                const patient_data = await db.collection("patients").findOne({"_id": new mongo.ObjectId(appointment.patient)});
+                const person = await db.collection("people").findOne({"_id": new mongo.ObjectId(patient_data.person)});
+                const res = {patient_id:appointment.patient,
+                            patient_name:person.Name,
+                            patient_surname:person.Surname,
+                            patient_ssn:person.Ssn,
+                            patient_sex:person.Sex,
+                            appointment_happening:appointment.is_happening,
+                            appointment_id:appointment._id};
+                return res;
+              }).then(function(result){
+                  socket.emit('doc_receive_patients', {err:0, patients_list:result});
+                  console.log('Patients list has been seend to the doctor');
+                  client.close();
+              }, function(reject_reason){
+                socket.emit('doc_receive_patients', {err:1});
+                client.close();
               });
           } else {
-            // TODO
+            console.log("API keys don't match")
+            socket.emit('doc_receive_patients', {err:1});
+            client.close();
           }
-          client.close();
-    });
-  });
-};
+        });
+  };
 
 io.on('connection', function(socket){
   console.log(process.env.MONGODB_HOST);

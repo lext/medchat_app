@@ -47,6 +47,10 @@ class Chat extends Component {
       const socket = openSocket("http://localhost:3000");
       const state = this.state;
       const to_send =  {api_key:state.api_key, user_id:state.user_id};
+
+      socket.on('doc_receive_patients', function(patients_list){
+        console.log(patients_list);
+      })
       socket.emit('doc_request_patients',to_send);
   }
 
@@ -64,6 +68,7 @@ class Chat extends Component {
             </ListGroup>
           </Col>
           <Col>
+              <h5> Chat feed:</h5>
               <ChatFeed
                 messages={this.state.messages} // Boolean: list of message objects
                 isTyping={this.state.is_typing} // Boolean: is the recipient typing
