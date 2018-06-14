@@ -61,7 +61,9 @@ class Auth extends Component {
             <Input name="ssn" onChange={this.handleChange.bind(this)} placeholder="Enter your SSN here" />
             <Label for="password">Password</Label>
             <Input type="password" name="password" onChange={this.handleChange.bind(this)} placeholder="Enter your password here" />
-            <Button type="submit" color="primary" onClick={this.authUser.bind(this)}>Submit</Button>
+            <div className="text-right">
+            <Button  style={{marginTop:10}}  type="submit" color="primary" onClick={this.authUser.bind(this)}>Submit</Button>
+            </div>
           </Col>
           <Col/>
         </Row>
