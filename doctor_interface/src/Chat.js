@@ -66,7 +66,7 @@ class Chat extends Component {
     const uid = state.user_id;
     const text = 'test text';
     if (patient.appointment_happening === false) return;
-    const to_send = {api_key:api_key, user_id:uid, patient_id:patient.patient_id, appointment:patient.appointment_id, text:text}
+    const to_send = {api_key:api_key, doc_id:uid, patient_id:patient.patient_id, appointment:patient.appointment_id, text:text}
     console.log(patient);
     this.state.msg_socket.emit('srv_receive_message_doc', to_send);
 

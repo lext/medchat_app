@@ -79,19 +79,19 @@ const registerAuth = function(socket) {
           socket.emit('auth_result', {ssn: client_data.ssn, auth_code: 1, user_id:user_data._id, api_key:api_key});
           // Storing the socket for further communication
           if (user_collection == 'patients') {
-            patients_arr[user_data._id] = {api_key:api_key, user_id:user_data._id};
+            patients_arr[user_data._id] = {socket:socket, api_key:api_key, user_id:user_data._id};
           } else {
               // Requesting the personal doctor data
               const doc_data = user_data;
               db.collection("people").findOne({"_id":new mongo.ObjectId(doc_data.person)}, function(err, person_data) {
                 assert.equal(err, null);
                 // Requesting specialization
-                console.log('Obtained thepersonal data for doctor'+ client_data.ssn);
+                console.log('Obtained the personal data for doctor'+ client_data.ssn);
                 db.collection("specialization").findOne({"_id":new mongo.ObjectId(doc_data.specialization)}, function(err, spec_data) {
                   assert.equal(err, null);
                   // When everything is found, we cache it
                   console.log('Specialization '+ client_data.ssn +' ['+user_collection+']');
-                  doctors_arr[doc_data._id] = {api_key:api_key, user_id:doc_data._id, name:person_data.Name, surname:person_data.Name, ssn:person_data.Ssn, specialization:spec_data.Name};
+                  doctors_arr[doc_data._id] = {socket:socket, api_key:api_key, user_id:doc_data._id, name:person_data.Name, surname:person_data.Name, ssn:person_data.Ssn, specialization:spec_data.Name};
                   client.close();
                 });
               });
@@ -137,7 +137,6 @@ const sendUserList = function(socket) {
                             message_history:[]};
                 return res;
               }).then(function(result){
-                  console.log(result);
                   socket.emit('doc_receive_patients', {err:0, patients_list:result});
                   console.log('Patients list has been seend to the doctor');
                   client.close();
@@ -154,7 +153,15 @@ const sendUserList = function(socket) {
 };
 
 const receiveMessage = function (socket){
-    socket.on('srv_receive_message_doc', async (client_data)=>{
+    socket.on('srv_receive_message_doc', (client_data)=>{
+      const pat_socket = client_data[client_data.pat_id];
+      socket.emit('doc_receive_message', client_data);
+      // We should use the translator here
+      if (typeof pat_socket !== "undefined") pat_socket.emit('pat_receive_message', client_data);
+      console.log('MSG Received from doctor and send to client ' + '[' + client_data.doc_id + '] '+ '[' + client_data.patient_id + '] ');
+    });
+
+    socket.on('srv_receive_message_pat', async (client_data)=>{
       console.log(client_data);
     });
 }
