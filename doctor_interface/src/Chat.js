@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component} from 'react';
 import { ChatFeed, Message } from 'react-chat-ui'
 import {
     ListGroup,
@@ -12,6 +12,7 @@ import {
     Button
 } from 'reactstrap';
 import openSocket from 'socket.io-client';
+import ReactDOM from 'react-dom'
 
 class Chat extends Component {
   constructor(props) {
@@ -31,7 +32,7 @@ class Chat extends Component {
     this.handleUserChage = this.handleUserChage.bind(this);
     this.handleMessageSend = this.handleMessageSend.bind(this);
     this.renderChat = this.renderChat.bind(this);
-    this.onChangeInput = this.onChangeInput.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
     //registering the callback on receiving the new message
     const component = this;
     this.state.msg_socket.on('doc_receive_message', function(msg){
@@ -67,27 +68,33 @@ class Chat extends Component {
 
   handleUserChage(e) {
     const list_index = e.currentTarget.attributes.listid.value;
-    console.log(list_index);
     const state = this.state;
-    const new_state = {api_key:state.api_key, user_id:state.user_id, patients:state.patients, selected:list_index, msg_socket:state.msg_socket}
+    const new_state = {api_key:state.api_key, user_id:state.user_id, patients:state.patients, selected:list_index, msg_socket:state.msg_socket, curr_msg:null}
     this.setState(new_state);
   }
 
   handleMessageSend(e) {
     e.preventDefault();
     const state = this.state;
-    console.log(state.curr_msg)
     const pat_index = state.selected;
     const patient = state.patients[pat_index];
     if (typeof patient === "undefined") return;
     const api_key = state.api_key;
     const uid = state.user_id;
-    const text = 'test text';
     if (patient.appointment_happening === false) return;
-    const to_send = {api_key:api_key, doc_id:uid, patient_id:patient.patient_id, appointment_id:patient.appointment_id, text:text}
-    this.state.msg_socket.emit('srv_receive_message_doc', to_send);
+    const curr_msg =  this.message_input.state.value;
+    if (curr_msg !== '' && typeof curr_msg !== "undefined"){
+      const to_send = {api_key:api_key, doc_id:uid, patient_id:patient.patient_id, appointment_id:patient.appointment_id, text:curr_msg}
+      this.state.msg_socket.emit('srv_receive_message_doc', to_send);
+      this.message_input.setState({value:""});
+      ReactDOM.findDOMNode(this.message_input).value = ""
+
+    }
   }
 
+  handleInputChange(e){
+    this.message_input.setState({value: e.target.value});
+  }
 
   renderChat(msg_display){
     if (typeof this.state.selected !== "undefined"){
@@ -111,13 +118,6 @@ class Chat extends Component {
         />;
     };
     return null;
-  }
-
-  onChangeInput(e){
-    e.preventDefault();
-    var cur_state = this.state;
-    cur_state.curr_msg = e.target.value;
-    this.setState(cur_state);
   }
 
   render() {
@@ -166,7 +166,11 @@ class Chat extends Component {
         <Row>
           <Col>
           <InputGroup style={{paddingTop:20}}>
-            <Input name="msg_input" onChange={this.onChangeInput} placeholder="Type here..." />
+            <Input name="msg_input"
+                   onChange={this.handleInputChange}
+                   ref={ref => this.message_input=ref} value={this.state.value}
+                   placeholder="Type here..." />
+
             <InputGroupAddon addonType="append">
               <Button color="primary" onClick={this.handleMessageSend}>Send</Button>
             </InputGroupAddon>
@@ -174,7 +178,6 @@ class Chat extends Component {
           </Col>
         </Row>
       </Container>
-
     )
   }
 
