@@ -198,12 +198,14 @@ const sendAppointmentsPatient = function(socket) {
 };
 
 const receiveMessage = function async (socket){
+    // In this method, we listen to any message coming from the clients (doctor and patient)
     socket.on('srv_receive_message_doc', async (client_data)=>{
       // TODO: check for API correctness
       const patient = patients_arr[client_data.patient_id];
       const client = await MongoClient.connect(url);
       const db = client.db("medchat");
-
+      // we create a new entry for the message and insert into the database
+      // TODO: We should use the translator here befor inserting !!! (probably some async / await stuff)
       var processed_msg = {from:'doc',
         doc_id: new mongo.ObjectId(client_data.doc_id),
         patient_id: new mongo.ObjectId(client_data.patient_id),
@@ -211,10 +213,10 @@ const receiveMessage = function async (socket){
         appointment_id: new mongo.ObjectId(client_data.appointment_id),
         date:new Date(Date.now()).toISOString()
       };
+      // now we wait until the message has been translated and inserted and then simply send it back
+      // to the sender
       let inserted = await db.collection("messages").insertOne(processed_msg);
       socket.emit('doc_receive_message', inserted.ops[0]);
-      // We should use the translator here
-
       if (typeof patient !== "undefined") {
         patient.socket.emit('pat_receive_message', inserted.ops[0]);
       }
@@ -222,11 +224,12 @@ const receiveMessage = function async (socket){
     });
 
     socket.on('srv_receive_message_pat', async (client_data)=>{
+      // The algorithm for the patient is the same as for the doctor
       // TODO: check for API correctness
       const doctor = doctors_arr[client_data.doc_id];
       const client = await MongoClient.connect(url);
       const db = client.db("medchat");
-      // TODO: translate, save, send
+      // TODO: translation for the patient
       var processed_msg = {from:'pat',
         doc_id: new mongo.ObjectId(client_data.doc_id),
         patient_id: new mongo.ObjectId(client_data.patient_id),
