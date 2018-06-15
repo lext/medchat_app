@@ -1,4 +1,3 @@
-# medchant_app
+# Medchat_app
 
-* Used pictures:
-        * https://www.pexels.com/photo/silver-iphone-6-near-blue-and-silver-stethoscope-48603/
+* Used picture: https://www.pexels.com/photo/silver-iphone-6-near-blue-and-silver-stethoscope-48603/
