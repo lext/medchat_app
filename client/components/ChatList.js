@@ -6,10 +6,11 @@ import {
   Button,
   FlatList,
 } from 'react-native';
+import  Header from 'react';
 import { Actions } from 'react-native-router-flux';
 import SocketIOClient from 'socket.io-client';
 
-class ChatList extends React.Component {
+class ChatList extends Component {
   constructor(props){
     super(props)
     this.state={
@@ -21,7 +22,7 @@ class ChatList extends React.Component {
     const socket = SocketIOClient("http://localhost:3000");
     socket.connect();
     const component = this;
-    socket.on('pat_receive_patients', function(appointments_data){
+    socket.on('pat_receive_appointments', function(appointments_data){
       if (appointments_data.err == 0){
         const new_state = component.state;
         var chats_past = [];
@@ -45,11 +46,13 @@ class ChatList extends React.Component {
   }
 
   handlePress(item) {
-    Actions.chat({user:item});
-    Actions.refresh({title: "Chat with "+item.key});
+    Actions.chat({appointment:item});
+    Actions.refresh({title: "Chat with "+item.doc_name + ' ' + item.doc_surname});
   }
 
   render() {
+    const name_show = 'test';//this.state.connection.patient_name;
+    console.log(name_show);
     return (
       <View>
         <FlatList

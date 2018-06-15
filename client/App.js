@@ -5,8 +5,6 @@ Client app which is using GiftedChat to connect to the server
 import React, { Component } from 'react';
 import {
   Platform,
-  StyleSheet,
-  Text,
   View
 } from 'react-native';
 

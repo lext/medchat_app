@@ -38,7 +38,7 @@ class Chat extends Component {
     this.state.msg_socket.on('doc_receive_message', function(msg){
         const new_state = component.state;
         if (typeof new_state.patients[msg.appointment_id] === "undefined"){
-          new_state.patients[msg.appointment_id].message_history = [msg];
+            new_state.patients[msg.appointment_id].message_history = [msg];
         } else {
             new_state.patients[msg.appointment_id].message_history.push(msg);
         }
@@ -88,8 +88,7 @@ class Chat extends Component {
       const to_send = {api_key:api_key, doc_id:uid, patient_id:patient.patient_id, appointment_id:patient.appointment_id, text:curr_msg}
       this.state.msg_socket.emit('srv_receive_message_doc', to_send);
       this.message_input.setState({value:""});
-      ReactDOM.findDOMNode(this.message_input).value = ""
-
+      ReactDOM.findDOMNode(this.message_input).value = "";
     }
   }
 
@@ -142,7 +141,7 @@ class Chat extends Component {
         const msgs = patients[state.selected].message_history;
         for (let i=0; i < msgs.length;i++){
           const msg = msgs[i];
-          msg_display.push(new Message({id: msg.from === state.user_id ? 0 : 1, message: msg.text}));
+          msg_display.push(new Message({id: msg.from === 'doc' ? 0 : 1, message: msg.text}));
         }
       };
     };

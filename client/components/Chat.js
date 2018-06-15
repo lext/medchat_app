@@ -1,23 +1,53 @@
 import { GiftedChat } from 'react-native-gifted-chat';
 import React, { Component } from 'react';
+import SocketIOClient from 'socket.io-client';
 
-class Chat extends React.Component {
-  state = {
-    messages: [
-    ],
+class Chat extends Component {
+  constructor(props){
+    super(props)
+    this.state = {
+      messages: [],
+      appointment:props.appointment,
+      connection:props.authState()
+    }
+
   }
 
-  onSend(messages = []) {
-    this.setState(previousState => ({
-      messages: GiftedChat.append(previousState.messages, messages),
-    }))
+  componentDidMount(){
+    const connection = this.state.connection;
+    const component = this;
+    const appointment = this.state.appointment;
+    connection.msg_socket.on('pat_receive_message', function(msg) {
+      var new_msg = msg;
+      new_msg.user = {_id:msg.from === 'doc' ? 0: 1,
+                      name:msg.from === 'doc' ? appointment.doc_name : appointment.patient_name};
+      component.setState(previousState => ({
+        messages: GiftedChat.append(previousState.messages, new_msg),
+      }))
+    });
+  }
+
+  onSend(msg) {
+    const state = this.state;
+    const appointment = state.appointment;
+    if(appointment.appointment_happening !== true) return;
+    const text = msg[0].text;
+    const socket = SocketIOClient("http://localhost:3000");
+    socket.connect();
+    const connection = this.state.connection;
+    const to_send = {api_key:connection.api_key,
+                     doc_id:appointment.doc_id,
+                     patient_id:appointment.patient_id,
+                     appointment_id:appointment.appointment_id,
+                     text:text};
+    socket.emit('srv_receive_message_pat', to_send);
   }
 
   render() {
     return (
       <GiftedChat
         messages={this.state.messages}
-        onSend={messages => this.onSend(messages)}
+        onSend={msg => this.onSend(msg)}
         user={{
           _id: 1,
         }}

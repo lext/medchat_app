@@ -164,28 +164,34 @@ const sendAppointmentsPatient = function(socket) {
                 const doc_data = await db.collection("doctors").findOne({"_id": new mongo.ObjectId(appointment.doctor)});
                 const doc_spec = await db.collection("specialization").findOne({"_id": new mongo.ObjectId(doc_data.specialization)});
                 const person = await db.collection("people").findOne({"_id": new mongo.ObjectId(doc_data.person)});
+
+                const patient_data = await db.collection("patients").findOne({"_id": new mongo.ObjectId(appointment.patient)});
+                const patient_person = await db.collection("people").findOne({"_id": new mongo.ObjectId(patient_data.person)});
                 //const conversation = await db.collection("messages").find({"conversation": new mongo.ObjectId(appointments._id)}).toArray();
                 const res = {patient_id:appointment.patient,
+                            doc_id: appointment.doctor,
                             doc_name:person.Name,
                             doc_surname:person.Surname,
                             appointment_happening:appointment.is_happening,
                             appointment_id:appointment._id,
                             doc_specialization: specs_dict[doc_spec.Name],
+                            patient_name: patient_person.Name,
+                            patient_surname: patient_person.Surname,
                             message_history:[]};
 
                 return res;
               }).then(function(result){
-                  socket.emit('pat_receive_patients', {err:0, apppointments_list:result});
+                  socket.emit('pat_receive_appointments', {err:0, apppointments_list:result});
                   console.log('Appointments list has been seend to the patient');
                   client.close();
               }, function(reject_reason){
                 console.log(reject_reason);
-                socket.emit('pat_receive_patients', {err:1});
+                socket.emit('pat_receive_appointments', {err:1});
                 client.close();
               });
           } else {
             console.log("API keys don't match")
-            socket.emit('doc_receive_patients', {err:1});
+            socket.emit('pat_receive_appointments', {err:1});
             client.close();
           }
         });
@@ -193,22 +199,28 @@ const sendAppointmentsPatient = function(socket) {
 
 const receiveMessage = function (socket){
     socket.on('srv_receive_message_doc', (client_data)=>{
-      const pat_socket = client_data[client_data.pat_id];
-      var processed_msg = {from:client_data.doc_id,
+      const patient = patients_arr[client_data.patient_id];
+      const msg_id = require('node-uuid')();
+      var processed_msg = {from:'doc',
+        _id: msg_id, // needs to be send using DB id
         doc_id:client_data.doc_id,
         patient_id:client_data.patient_id,
         text:client_data.text,
         appointment_id:client_data.appointment_id
       };
       // TODO: translate, save, send
-      socket.emit('doc_receive_message', processed_msg );
+      socket.emit('doc_receive_message', processed_msg);
       // We should use the translator here
-      if (typeof pat_socket !== "undefined") pat_socket.emit('pat_receive_message', processed_msg);
+
+      if (typeof patient !== "undefined") {
+        patient.socket.emit('pat_receive_message', processed_msg);
+      }
       console.log('MSG Received from doctor and send to client ' + '[' + client_data.doc_id + '] '+ '[' + client_data.patient_id + '] ');
     });
 
     socket.on('srv_receive_message_pat', (client_data)=>{
-      console.log(client_data);
+      // TODO: translate, save, send
+      //socket.emit('doc_receive_message', processed_msg);
     });
 }
 
