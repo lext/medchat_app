@@ -34,18 +34,20 @@ class Chat extends Component {
     this.renderChat = this.renderChat.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     //registering the callback on receiving the new message
+  }
+
+  componentDidMount(){
     const component = this;
     this.state.msg_socket.on('doc_receive_message', function(msg){
+        console.log(msg);
         const new_state = component.state;
         if (typeof new_state.patients[msg.appointment_id] === "undefined"){
             new_state.patients[msg.appointment_id].message_history = [msg];
         } else {
             new_state.patients[msg.appointment_id].message_history.push(msg);
         }
-
         component.setState(new_state);
     });
-
   }
 
   retrieveUsers(){

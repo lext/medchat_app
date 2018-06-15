@@ -199,8 +199,10 @@ const sendAppointmentsPatient = function(socket) {
 
 const receiveMessage = function (socket){
     socket.on('srv_receive_message_doc', (client_data)=>{
+      // TODO: check for API correctness
       const patient = patients_arr[client_data.patient_id];
       const msg_id = require('node-uuid')();
+      // TODO: translate, save, send
       var processed_msg = {from:'doc',
         _id: msg_id, // needs to be send using DB id
         doc_id:client_data.doc_id,
@@ -208,7 +210,6 @@ const receiveMessage = function (socket){
         text:client_data.text,
         appointment_id:client_data.appointment_id
       };
-      // TODO: translate, save, send
       socket.emit('doc_receive_message', processed_msg);
       // We should use the translator here
 
@@ -219,8 +220,23 @@ const receiveMessage = function (socket){
     });
 
     socket.on('srv_receive_message_pat', (client_data)=>{
+      // TODO: check for API correctness
+      const doctor = doctors_arr[client_data.doc_id];
+      const msg_id = require('node-uuid')();
       // TODO: translate, save, send
-      //socket.emit('doc_receive_message', processed_msg);
+      var processed_msg = {from:'pat',
+        _id: msg_id, // needs to be send using DB id
+        doc_id:client_data.doc_id,
+        patient_id:client_data.patient_id,
+        text:client_data.text,
+        appointment_id:client_data.appointment_id
+      };
+      socket.emit('pat_receive_message', processed_msg);
+      if (typeof doctor !== "undefined") {
+        doctor.socket.emit('doc_receive_message', processed_msg);
+      }
+
+      console.log('MSG Received from patient and send to doctor ' + '[' + client_data.patient_id + '] '+ '[' + client_data.doc_id + '] ');
     });
 }
 

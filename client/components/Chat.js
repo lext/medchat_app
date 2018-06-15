@@ -19,7 +19,8 @@ class Chat extends Component {
     const appointment = this.state.appointment;
     connection.msg_socket.on('pat_receive_message', function(msg) {
       var new_msg = msg;
-      new_msg.user = {_id:msg.from === 'doc' ? 0: 1,
+      console.log(msg);
+      new_msg.user = {_id: msg.from === 'doc' ? 2: 1,
                       name:msg.from === 'doc' ? appointment.doc_name : appointment.patient_name};
       component.setState(previousState => ({
         messages: GiftedChat.append(previousState.messages, new_msg),
@@ -32,9 +33,8 @@ class Chat extends Component {
     const appointment = state.appointment;
     if(appointment.appointment_happening !== true) return;
     const text = msg[0].text;
-    const socket = SocketIOClient("http://localhost:3000");
-    socket.connect();
     const connection = this.state.connection;
+    const socket = connection.msg_socket;
     const to_send = {api_key:connection.api_key,
                      doc_id:appointment.doc_id,
                      patient_id:appointment.patient_id,
