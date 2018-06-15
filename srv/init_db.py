@@ -116,7 +116,7 @@ if __name__ == "__main__":
         },
         {
             "person": people.find_one({"Ssn": "090182-9300"})['_id'], # Geralt of Rivia
-            "specialization": specialization.find_one({"Name": "NL"})['_id'],
+            "specialization": specialization.find_one({"Name": "GP"})['_id'],
             "salt": salts[2],
             "password": passwords[2],
 

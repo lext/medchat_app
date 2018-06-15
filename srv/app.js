@@ -14,7 +14,7 @@ const mongo = require('mongodb');
 const MongoClient = mongo.MongoClient;
 const assert = require('assert');
 const url = 'mongodb://db:27017';
-
+const specs_dict = {PT: 'Physiotherapist', GP:'GP'};
 
 const retrieveAuthUserInfo = function(socket, user_collection, channel, callback) {
   /*
@@ -158,10 +158,11 @@ const sendAppointmentsPatient = function(socket) {
           // Connecting
           const client = await MongoClient.connect(url);
           const db = client.db("medchat");
-          if (doctors_arr[client_data.user_id].api_key === client_data.api_key) {
+          if (patients_arr[client_data.user_id].api_key === client_data.api_key) {
               const appointments_list = await db.collection("appointments").find({"patient":new mongo.ObjectId(client_data.user_id)}).toArray();
               processAppointments(appointments_list, db, async function(appointment, db){
                 const doc_data = await db.collection("doctors").findOne({"_id": new mongo.ObjectId(appointment.doctor)});
+                const doc_spec = await db.collection("specialization").findOne({"_id": new mongo.ObjectId(doc_data.specialization)});
                 const person = await db.collection("people").findOne({"_id": new mongo.ObjectId(doc_data.person)});
                 //const conversation = await db.collection("messages").find({"conversation": new mongo.ObjectId(appointments._id)}).toArray();
                 const res = {patient_id:appointment.patient,
@@ -169,13 +170,16 @@ const sendAppointmentsPatient = function(socket) {
                             doc_surname:person.Surname,
                             appointment_happening:appointment.is_happening,
                             appointment_id:appointment._id,
+                            doc_specialization: specs_dict[doc_spec.Name],
                             message_history:[]};
+
                 return res;
               }).then(function(result){
                   socket.emit('pat_receive_patients', {err:0, apppointments_list:result});
-                  console.log('Appointments list has been seend to the doctor');
+                  console.log('Appointments list has been seend to the patient');
                   client.close();
               }, function(reject_reason){
+                console.log(reject_reason);
                 socket.emit('pat_receive_patients', {err:1});
                 client.close();
               });
@@ -203,7 +207,7 @@ const receiveMessage = function (socket){
       console.log('MSG Received from doctor and send to client ' + '[' + client_data.doc_id + '] '+ '[' + client_data.patient_id + '] ');
     });
 
-    socket.on('srv_receive_message_pat', async (client_data)=>{
+    socket.on('srv_receive_message_pat', (client_data)=>{
       console.log(client_data);
     });
 }
@@ -212,6 +216,7 @@ io.on('connection', function(socket){
   console.log('Client connected');
   registerAuth(socket);
   sendAppointmentsDoc(socket);
+  sendAppointmentsPatient(socket);
   receiveMessage(socket);
 });
 

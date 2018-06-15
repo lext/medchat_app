@@ -49,7 +49,8 @@ class Chat extends Component {
   }
 
   retrieveUsers(){
-      const socket = openSocket("http://lext-devbox:3000");
+      //const socket = openSocket("http://lext-devbox:3000");
+      const socket = openSocket("http://localhost:3000");
       const state = this.state;
       const component = this;
       const to_send =  {api_key:state.api_key, user_id:state.user_id};
@@ -158,7 +159,7 @@ class Chat extends Component {
           </Col>
           <Col>
             <h5> Chat feed:</h5>
-            <div style={{overflowY:'scroll', height:'700px', display:'flex', flexDirection:'column-reverse'}}>
+            <div style={{overflowY:'scroll', height:'500px', display:'flex', flexDirection:'column-reverse'}}>
               {this.renderChat(msg_display)}
             </div>
           </Col>

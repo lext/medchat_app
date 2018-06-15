@@ -23,7 +23,8 @@ class Auth extends Component {
   }
 
   authUser(){
-      const socket = openSocket("http://lext-devbox:3000");
+      //const socket = openSocket("http://lext-devbox:3000");
+      const socket = openSocket("http://localhost:3000");
       const state = this.state;
       const props = this.props;
       socket.on('doctors_auth_salt', function(client_data){

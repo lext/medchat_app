@@ -21,9 +21,7 @@ import Home from './components/Home.js';
 class App extends Component{
   constructor(props) {
     super(props);
-    this.state = {
-      test_var:"sda"
-    }
+    this.state = {}
     this.handleAuth = this.handleAuth.bind(this);
     this.getMainState = this.getMainState.bind(this);
    }
@@ -57,6 +55,7 @@ class App extends Component{
             key="chat"
             component={Chat}
             title="Chat"
+            authState={this.getMainState}
           />
         </Scene>
       </Router>

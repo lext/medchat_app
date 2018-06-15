@@ -25,7 +25,8 @@ class Home extends React.Component {
     // Initializing the socket if it is not yet initialized
     if (typeof this.socket == "undefined"){
       console.log('Trying to connect to the server')
-      this.socket = SocketIOClient("http://lext-devbox:3000");
+      //const socket = SocketIOClient("http://lext-devbox:3000");
+      this.socket = SocketIOClient("http://localhost:3000");
       this.socket.connect();
       this.pass = 'test4';
       this.login = '221181-289H';
