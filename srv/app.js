@@ -116,7 +116,7 @@ async function processAppointments(appointments, db, fn) {
     return results;
 };
 
-const sendUserList = function(socket) {
+const sendAppointmentsDoc = function(socket) {
   socket.on('doc_request_patients', async (client_data)=>{
           // Connecting
           const client = await MongoClient.connect(url);
@@ -137,11 +137,46 @@ const sendUserList = function(socket) {
                             message_history:[]};
                 return res;
               }).then(function(result){
-                  socket.emit('doc_receive_patients', {err:0, patients_list:result});
+                  socket.emit('doc_receive_patients', {err:0, apppointments_list:result});
                   console.log('Patients list has been seend to the doctor');
                   client.close();
               }, function(reject_reason){
                 socket.emit('doc_receive_patients', {err:1});
+                client.close();
+              });
+          } else {
+            console.log("API keys don't match")
+            socket.emit('doc_receive_patients', {err:1});
+            client.close();
+          }
+        });
+};
+
+
+const sendAppointmentsPatient = function(socket) {
+  socket.on('pat_request_patients', async (client_data)=>{
+          // Connecting
+          const client = await MongoClient.connect(url);
+          const db = client.db("medchat");
+          if (doctors_arr[client_data.user_id].api_key === client_data.api_key) {
+              const appointments_list = await db.collection("appointments").find({"patient":new mongo.ObjectId(client_data.user_id)}).toArray();
+              processAppointments(appointments_list, db, async function(appointment, db){
+                const doc_data = await db.collection("doctors").findOne({"_id": new mongo.ObjectId(appointment.doctor)});
+                const person = await db.collection("people").findOne({"_id": new mongo.ObjectId(doc_data.person)});
+                //const conversation = await db.collection("messages").find({"conversation": new mongo.ObjectId(appointments._id)}).toArray();
+                const res = {patient_id:appointment.patient,
+                            doc_name:person.Name,
+                            doc_surname:person.Surname,
+                            appointment_happening:appointment.is_happening,
+                            appointment_id:appointment._id,
+                            message_history:[]};
+                return res;
+              }).then(function(result){
+                  socket.emit('pat_receive_patients', {err:0, apppointments_list:result});
+                  console.log('Appointments list has been seend to the doctor');
+                  client.close();
+              }, function(reject_reason){
+                socket.emit('pat_receive_patients', {err:1});
                 client.close();
               });
           } else {
@@ -176,7 +211,7 @@ const receiveMessage = function (socket){
 io.on('connection', function(socket){
   console.log('Client connected');
   registerAuth(socket);
-  sendUserList(socket);
+  sendAppointmentsDoc(socket);
   receiveMessage(socket);
 });
 

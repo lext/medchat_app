@@ -56,10 +56,10 @@ class Chat extends Component {
 
       socket.on('doc_receive_patients', function(srv_data){
         if (srv_data.err === 0) {
-          var new_patients_list = {};
+          var apppointments_list = {};
           // COnverting the received data to teh key-value format
-          srv_data.patients_list.forEach((el)=>{new_patients_list[el.appointment_id]=el});
-          let new_state = {api_key:state.api_key, user_id:state.user_id, patients:new_patients_list, selected:0}
+          srv_data.apppointments_list.forEach((el)=>{apppointments_list[el.appointment_id]=el});
+          let new_state = {api_key:state.api_key, user_id:state.user_id, patients:apppointments_list, selected:0}
           component.setState(new_state);
         }
       })

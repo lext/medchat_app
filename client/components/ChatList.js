@@ -7,14 +7,19 @@ import {
   FlatList,
 } from 'react-native';
 import { Actions } from 'react-native-router-flux';
+import SocketIOClient from 'socket.io-client';
 
 class ChatList extends React.Component {
-  state={
-    chats: [
-      {key: "Devin"},
-      {key: "Jackson"},
-      {key: "James"},
-    ],
+  constructor(props){
+    super(props)
+    this.state={
+      chats: [],
+      connection:props.authState();
+    };
+
+    const socket = SocketIOClient("http://lext-devbox:3000");
+    socket.connect();
+
   }
 
   handlePress(item) {

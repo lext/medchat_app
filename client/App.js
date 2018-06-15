@@ -22,15 +22,18 @@ class App extends Component{
   constructor(props) {
     super(props);
     this.state = {
+      test_var:"sda"
     }
     this.handleAuth = this.handleAuth.bind(this);
+    this.getMainState = this.getMainState.bind(this);
    }
 
   handleAuth(auth_socket, auth_result){
-    if (auth_result.auth_code === 1) {
-      console.log(auth_result);
-      this.setState({api_key: auth_result.api_key, user_id:auth_result.user_id, msg_socket:auth_socket});
-    }
+    this.setState({api_key: auth_result.api_key, user_id:auth_result.user_id, msg_socket:auth_socket});
+  }
+
+  getMainState(){
+    return this.state
   }
 
   render() {
@@ -48,6 +51,7 @@ class App extends Component{
             component={ChatList}
             hideNavBar={true}
             title="Chats"
+            authState={this.getMainState}
           />
           <Scene
             key="chat"
