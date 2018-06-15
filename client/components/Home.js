@@ -18,17 +18,25 @@ YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTIm
 
 class Home extends React.Component {
 
+  constructor(props){
+    super(props)
+  }
   confirmUser() {
     // Initializing the socket if it is not yet initialized
     if (typeof this.socket == "undefined"){
       console.log('Trying to connect to the server')
       this.socket = SocketIOClient("http://lext-devbox:3000");
       this.socket.connect();
+      this.pass = 'test4';
+      this.login = '221181-289H';
     }
     // This should happen if the server will approve the authentication
+    const handleAuth = this.props.handleAuth;
+
     this.socket.on('auth_result', (data)=> {
       if (data.auth_code == 1) {
-          Actions.chatlist();
+          handleAuth(this.socket, data);
+          Actions.chatlist(data);
       }
     });
 
