@@ -126,7 +126,7 @@ const sendAppointmentsDoc = function(socket) {
               processAppointments(appointments_list, db, async function(appointment, db){
                 const patient_data = await db.collection("patients").findOne({"_id": new mongo.ObjectId(appointment.patient)});
                 const person = await db.collection("people").findOne({"_id": new mongo.ObjectId(patient_data.person)});
-                //const conversation = await db.collection("messages").find({"conversation": new mongo.ObjectId(appointments._id)}).toArray();
+                const msg_history = await db.collection("messages").find({"appointment_id": new mongo.ObjectId(appointment._id)}).limit(200).toArray();
                 const res = {patient_id:appointment.patient,
                             patient_name:person.Name,
                             patient_surname:person.Surname,
@@ -134,7 +134,7 @@ const sendAppointmentsDoc = function(socket) {
                             patient_sex:person.Sex,
                             appointment_happening:appointment.is_happening,
                             appointment_id:appointment._id,
-                            message_history:[]};
+                            message_history:msg_history};
                 return res;
               }).then(function(result){
                   socket.emit('doc_receive_patients', {err:0, apppointments_list:result});
@@ -167,7 +167,7 @@ const sendAppointmentsPatient = function(socket) {
 
                 const patient_data = await db.collection("patients").findOne({"_id": new mongo.ObjectId(appointment.patient)});
                 const patient_person = await db.collection("people").findOne({"_id": new mongo.ObjectId(patient_data.person)});
-                //const conversation = await db.collection("messages").find({"conversation": new mongo.ObjectId(appointments._id)}).toArray();
+                const msg_history = await db.collection("messages").find({"appointment_id": new mongo.ObjectId(appointment._id)}).limit(200).toArray();
                 const res = {patient_id:appointment.patient,
                             doc_id: appointment.doctor,
                             doc_name:person.Name,
@@ -177,7 +177,7 @@ const sendAppointmentsPatient = function(socket) {
                             doc_specialization: specs_dict[doc_spec.Name],
                             patient_name: patient_person.Name,
                             patient_surname: patient_person.Surname,
-                            message_history:[]};
+                            message_history:msg_history};
 
                 return res;
               }).then(function(result){
@@ -205,10 +205,11 @@ const receiveMessage = function async (socket){
       const db = client.db("medchat");
 
       var processed_msg = {from:'doc',
-        doc_id:client_data.doc_id,
-        patient_id:client_data.patient_id,
+        doc_id: new mongo.ObjectId(client_data.doc_id),
+        patient_id: new mongo.ObjectId(client_data.patient_id),
         text:client_data.text,
-        appointment_id:client_data.appointment_id
+        appointment_id: new mongo.ObjectId(client_data.appointment_id),
+        date:new Date(Date.now()).toISOString()
       };
       let inserted = await db.collection("messages").insertOne(processed_msg);
       socket.emit('doc_receive_message', inserted.ops[0]);
@@ -227,10 +228,11 @@ const receiveMessage = function async (socket){
       const db = client.db("medchat");
       // TODO: translate, save, send
       var processed_msg = {from:'pat',
-        doc_id:client_data.doc_id,
-        patient_id:client_data.patient_id,
+        doc_id: new mongo.ObjectId(client_data.doc_id),
+        patient_id: new mongo.ObjectId(client_data.patient_id),
         text:client_data.text,
-        appointment_id:client_data.appointment_id
+        appointment_id: new mongo.ObjectId(client_data.appointment_id),
+        date:new Date(Date.now()).toISOString()
       };
       let inserted = await db.collection("messages").insertOne(processed_msg);
       socket.emit('pat_receive_message', inserted.ops[0]);

@@ -17,6 +17,17 @@ class Chat extends Component {
     const connection = this.state.connection;
     const component = this;
     const appointment = this.state.appointment;
+    var messages_state = appointment.message_history;
+    for (let i=0; i < messages_state.length; i++){
+      const msg = messages_state[i];
+      messages_state[i].user = {_id: msg.from === 'doc' ? 2: 1,
+                          name:msg.from === 'doc' ? appointment.doc_name : appointment.patient_name};
+    }
+
+    var new_state = {messages: messages_state,
+                    appointment:appointment,
+                    connection:connection}
+    component.setState(new_state);
     connection.msg_socket.on('pat_receive_message', function(msg) {
       var new_msg = msg;
       console.log(msg);
