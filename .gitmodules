@@ -1,0 +1,6 @@
+[submodule "translation/deep_docker"]
+	path = translation/deep_docker
+	url = https://github.com/lext/deep_docker
+[submodule "translation/OpenNMT-py"]
+	path = translation/OpenNMT-py
+	url = https://github.com/OpenNMT/OpenNMT-py
