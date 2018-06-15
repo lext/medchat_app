@@ -197,43 +197,45 @@ const sendAppointmentsPatient = function(socket) {
         });
 };
 
-const receiveMessage = function (socket){
-    socket.on('srv_receive_message_doc', (client_data)=>{
+const receiveMessage = function async (socket){
+    socket.on('srv_receive_message_doc', async (client_data)=>{
       // TODO: check for API correctness
       const patient = patients_arr[client_data.patient_id];
-      const msg_id = require('node-uuid')();
-      // TODO: translate, save, send
+      const client = await MongoClient.connect(url);
+      const db = client.db("medchat");
+
       var processed_msg = {from:'doc',
-        _id: msg_id, // needs to be send using DB id
         doc_id:client_data.doc_id,
         patient_id:client_data.patient_id,
         text:client_data.text,
         appointment_id:client_data.appointment_id
       };
-      socket.emit('doc_receive_message', processed_msg);
+      let inserted = await db.collection("messages").insertOne(processed_msg);
+      socket.emit('doc_receive_message', inserted.ops[0]);
       // We should use the translator here
 
       if (typeof patient !== "undefined") {
-        patient.socket.emit('pat_receive_message', processed_msg);
+        patient.socket.emit('pat_receive_message', inserted.ops[0]);
       }
       console.log('MSG Received from doctor and send to client ' + '[' + client_data.doc_id + '] '+ '[' + client_data.patient_id + '] ');
     });
 
-    socket.on('srv_receive_message_pat', (client_data)=>{
+    socket.on('srv_receive_message_pat', async (client_data)=>{
       // TODO: check for API correctness
       const doctor = doctors_arr[client_data.doc_id];
-      const msg_id = require('node-uuid')();
+      const client = await MongoClient.connect(url);
+      const db = client.db("medchat");
       // TODO: translate, save, send
       var processed_msg = {from:'pat',
-        _id: msg_id, // needs to be send using DB id
         doc_id:client_data.doc_id,
         patient_id:client_data.patient_id,
         text:client_data.text,
         appointment_id:client_data.appointment_id
       };
-      socket.emit('pat_receive_message', processed_msg);
+      let inserted = await db.collection("messages").insertOne(processed_msg);
+      socket.emit('pat_receive_message', inserted.ops[0]);
       if (typeof doctor !== "undefined") {
-        doctor.socket.emit('doc_receive_message', processed_msg);
+        doctor.socket.emit('doc_receive_message', inserted.ops[0]);
       }
 
       console.log('MSG Received from patient and send to doctor ' + '[' + client_data.patient_id + '] '+ '[' + client_data.doc_id + '] ');
