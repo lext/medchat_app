@@ -1,6 +1,7 @@
 # Android stuff
 
 srv/database/
+translation/train_data/
 
 # built application files
 *.apk
