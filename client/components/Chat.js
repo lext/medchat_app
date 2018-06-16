@@ -17,7 +17,7 @@ class Chat extends Component {
     const connection = this.state.connection;
     const component = this;
     const appointment = this.state.appointment;
-    var messages_state = appointment.message_history;
+    var messages_state = appointment.message_history.reverse();
     // Modifying the received history in order to display them correctly
     for (let i=0; i < messages_state.length; i++){
       const msg = messages_state[i];
