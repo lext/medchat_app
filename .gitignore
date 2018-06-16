@@ -2,7 +2,10 @@
 
 srv/database/
 translation/train_data/
-translation/tb_logs_docker/
+translation/nmt_train/tb_logs_docker/
+translation/nmt_train/fin-eng.txt
+translation/nmt_train/fin-en.txt
+translation/nmt_train/.ipynb_checkpoints/
 
 # built application files
 *.apk
@@ -109,3 +112,4 @@ typings/
 
 # next.js build output
 .next
+
