@@ -12,13 +12,24 @@ unzip opusparcus_fi.zip
 
 cd opusparcus_v1
 TO_RETURN=$PWD
-cd en
-cd train
+cd $TO_RETURN/en/train
 echo "==> extracting English"
 bzip2 -dk en-train.txt.bz2
+cat en-train.txt | cut -f2 > en_train.txt
+cat en-train.txt | cut -f3 >> en_train.txt
+# test data
+cd $TO_RETURN/en/test
+cat en-test.txt | cut -f2 > en_test.txt
+cat en-test.txt | cut -f3 >> en_test.txt
 
-cd $TO_RETURN
-cd fi
-cd train
+
+
 echo "==> extracting Finnsih"
+cd $TO_RETURN/fi/train
 bzip2 -dk fi-train.txt.bz2
+cat fi-train.txt | cut -f2 > fi_train.txt
+cat fi-train.txt | cut -f3 >> fi_train.txt
+# test data
+cd $TO_RETURN/fi/test
+cat fi-test.txt | cut -f2 > fi_test.txt
+cat fi-test.txt | cut -f3 >> fi_test.txt
