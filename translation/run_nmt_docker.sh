@@ -1,8 +1,10 @@
 #!/bin/bash
 
-mkdir -p nmt_training
+
 CONTAINER="dl_container_opennmt"
-DATADIR=$PWD
+DATADIR=nmt_train
+mkdir -p $DATADIR
+
 # Stop and kill the container if it is running
 if [ "$(docker ps -q -f name=$CONTAINER)" ]; then
     echo "Terminating the container"

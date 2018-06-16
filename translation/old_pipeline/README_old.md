@@ -1,4 +1,4 @@
-# Trainign Neural-Machine Translation system for English-Finnish and Finnish-English
+# ~Trainign Neural-Machine Translation system for English-Finnish and Finnish-English~ (THIS WAS JUST AN EXPERIMENT | DO NOT USE IT!!!!)
 * First, install docker from deep_docker the way it is described in the corresponding README
 * Fetch the data using `fetch_data.sh`.
 * Run docker using `run_nmt_docker.sh`
