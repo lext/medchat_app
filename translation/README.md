@@ -26,6 +26,12 @@ python make_splits.py
 ```
 cd OpenNMT-py
 pip install -r requirements.txt
-python preprocess.py -train_src ../train_data/en_train.txt -train_tgt ../train_data/fi_train.txt -valid_src ../train_data/en_test.txt -valid_tgt ../train_data/fi_test.txt -save_data ../train_data/en_fi_preprocessed.onmt
-python preprocess.py -train_src ../train_data/fi_train.txt -train_tgt ../train_data/en_train.txt -valid_src ../train_data/fi_test.txt -valid_tgt ../train_data/en_test.txt -save_data ../train_data/fi_en_preprocessed.onmt
+python preprocess.py -train_src ../train_data/en_train.txt -train_tgt ../train_data/fi_train.txt -valid_src ../train_data/en_val.txt -valid_tgt ../train_data/fi_val.txt -save_data ../train_data/en_fi_preprocessed.onmt
+python preprocess.py -train_src ../train_data/fi_train.txt -train_tgt ../train_data/en_train.txt -valid_src ../train_data/fi_val.txt -valid_tgt ../train_data/en_val.txt -save_data ../train_data/fi_en_preprocessed.onmt
+```
+
+* Run the training
+
+```
+python train.py -data ../train_data/en_fi_preprocessed.onmt -tensorboard -tensorboard_log_dir ../tb_logs_docker/nmt/ -gpuid 0 -batch_size 128
 ```

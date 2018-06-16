@@ -2,6 +2,7 @@
 
 srv/database/
 translation/train_data/
+translation/tb_logs_docker/
 
 # built application files
 *.apk
