@@ -21,6 +21,7 @@ if __name__ == "__main__":
         tok = tok.replace(u'\u2581', ' ')
         tok = tok.split(' ')
         new_tok = []
+        # There is a small bug, which needs to be fixed. First word is always empty
         for word in tok:
             if word!='':
                 if word.startswith('(') or word.startswith('[') or word.startswith('{') or word.startswith('<'):
@@ -36,4 +37,6 @@ if __name__ == "__main__":
                             flag = False
                     if flag:
                         new_tok.append(word)
+            else:
+                new_tok.append('___EMPTY___')
         print(' '.join(new_tok))
