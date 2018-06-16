@@ -4,7 +4,7 @@
 CONTAINER="dl_container_opennmt"
 DATADIR=$PWD/nmt_train
 mkdir -p $DATADIR
-
+chmod -R ug+s $DATADIR
 # Stop and kill the container if it is running
 if [ "$(docker ps -q -f name=$CONTAINER)" ]; then
     echo "Terminating the container"
