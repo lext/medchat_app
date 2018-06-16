@@ -94,15 +94,14 @@ def indexes_from_sentence(lang, sentence):
 def indices_from_sentence(lang, sentence):
     return [lang.word2index[word] for word in sentence.split(' ')]
 
-def tensor_from_sentence(lang, sentence, use_cuda=True):
+def tensor_from_sentence(lang, sentence, device):
     indices = indices_from_sentence(lang, sentence)
     indices.append(EOS_token)
     res = torch.LongTensor(indices).view(-1, 1)
-    if use_cuda: res = res.to('cuda')
-    return res
+    return res.to(device)
 
-def pair2tensors(pair, input_lang, output_lang):
+def pair2tensors(pair, input_lang, output_lang, device):
     # Converts a pair of sentences into tensor
-    input_variable = tensor_from_sentence(input_lang, pair[0])
-    target_variable = tensor_from_sentence(output_lang, pair[1])
+    input_variable = tensor_from_sentence(input_lang, pair[0], device)
+    target_variable = tensor_from_sentence(output_lang, pair[1], device)
     return (input_variable, target_variable)
