@@ -6,6 +6,7 @@ translation/nmt_train/tb_logs_docker/
 translation/nmt_train/fin-eng.txt
 translation/nmt_train/fin-en.txt
 translation/nmt_train/.ipynb_checkpoints/
+translation/nmt_train/__pycache__/
 
 # built application files
 *.apk
