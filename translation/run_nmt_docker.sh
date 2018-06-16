@@ -2,7 +2,7 @@
 
 
 CONTAINER="dl_container_opennmt"
-DATADIR=nmt_train
+DATADIR=$PWD/nmt_train
 mkdir -p $DATADIR
 
 # Stop and kill the container if it is running
