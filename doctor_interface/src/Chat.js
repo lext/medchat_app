@@ -143,7 +143,8 @@ class Chat extends Component {
         const msgs = patients[state.selected].message_history;
         for (let i=0; i < msgs.length;i++){
           const msg = msgs[i];
-          msg_display.push(new Message({id: msg.from === 'doc' ? 0 : 1, message: msg.text}));
+          msg_display.push(new Message({id: msg.from === 'doc' ? 0 : 1,
+                                        message: msg.from === 'doc' ? msg.original_text : msg.text}));
         }
       };
     };

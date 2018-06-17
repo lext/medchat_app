@@ -7,6 +7,11 @@ services:
       - "0.0.0.0:27017:27017"
     volumes:
         - $PWD/database/:/data/db
+  nmt_api:
+    container_name: "nmt_api"
+    image: docker_serve_nmt
+    ports:
+      - "0.0.0.0:5000:5000"
   srv:
     container_name: "medchat_server"
     build: .
@@ -17,8 +22,10 @@ services:
       - "127.0.0.1:3000:3000"
     depends_on:
       - db
+      - nmt_api
     links:
       - "db"
+      - "nmt_api"
     environment:
       MONGODB_HOST: db
     command: npm start

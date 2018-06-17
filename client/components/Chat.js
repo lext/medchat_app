@@ -23,7 +23,12 @@ class Chat extends Component {
       const msg = messages_state[i];
       messages_state[i].user = {_id: msg.from === 'doc' ? 2: 1,
                           name:msg.from === 'doc' ? appointment.doc_name : appointment.patient_name};
-    }
+
+      console.log(msg);
+      if (msg.from !== 'doc'){
+        msg.text = msg.original_text;
+      }
+    };
 
     // Creating a new state to render the history
     var new_state = {messages: messages_state,

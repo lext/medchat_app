@@ -7,6 +7,9 @@ COPY decoder_fin_eng.pt .
 COPY encoder_eng_fin.pt .
 COPY encoder_fin_eng.pt .
 COPY data_utils.py .
-COPY train.py . 
+COPY train.py .
 COPY fin-en.txt .
 COPY server.py .
+
+EXPOSE 5000
+CMD ["python" , "server.py"]

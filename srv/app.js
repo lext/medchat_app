@@ -1,6 +1,7 @@
 var app = require('express')();
 
 var http_srv = require('http').Server(app);
+let request = require('async-request');
 var io = require('socket.io')(http_srv);
 // will be used to store the users
 var patients_arr = {};
@@ -206,10 +207,17 @@ const receiveMessage = function async (socket){
       const db = client.db("medchat");
       // we create a new entry for the message and insert into the database
       // TODO: We should use the translator here befor inserting !!! (probably some async / await stuff)
+      response = await request('http://nmt_api:5000/translate', {
+        method: 'POST',
+        headers: {'content-type':'application/json'},
+        data: JSON.stringify({src:client_data.text, direction:1})
+      });
+      console.log(response);
       var processed_msg = {from:'doc',
         doc_id: new mongo.ObjectId(client_data.doc_id),
         patient_id: new mongo.ObjectId(client_data.patient_id),
-        text:client_data.text,
+        original_text:client_data.text,
+        text:JSON.parse(response.body).tgt,
         appointment_id: new mongo.ObjectId(client_data.appointment_id),
         date:new Date(Date.now()).toISOString()
       };

@@ -7,6 +7,7 @@
   "private": true,
   "license": "MIT",
   "dependencies": {
+    "async-request": "^1.2.0",
     "bluebird": "^3.5.1",
     "console-stamp": "^0.2.6",
     "express": "latest",
