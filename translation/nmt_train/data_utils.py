@@ -52,12 +52,12 @@ class Lang:
 
 
 
-def read_langs(lang1, lang2, reverse=False):
+def read_langs(lang1, lang2, reverse=False, main_dir='.'):
     print("Reading lines...")
 
     # Read the file and split into lines
     lines = []
-    with codecs.open('%s-%s.txt' % (lang1, lang2), "r",encoding='utf-8') as f:
+    with codecs.open('%s/%s-%s.txt' % (main_dir, lang1, lang2), "r",encoding='utf-8') as f:
         for line in f:
             lines.append(line)
     # Split every line into pairs and normalize
@@ -74,8 +74,8 @@ def read_langs(lang1, lang2, reverse=False):
 
     return input_lang, output_lang, pairs
 
-def prepare_data(lang1_name, lang2_name, reverse=False):
-    input_lang, output_lang, pairs = read_langs(lang1_name, lang2_name, reverse)
+def prepare_data(lang1_name, lang2_name, reverse=False, main_dir='.'):
+    input_lang, output_lang, pairs = read_langs(lang1_name, lang2_name, reverse, main_dir)
     print("Indexing words...")
     for pair in pairs:
         input_lang.index_words(pair[0])
@@ -85,10 +85,6 @@ def prepare_data(lang1_name, lang2_name, reverse=False):
 
 def indexes_from_sentence(lang, sentence):
     return [lang.word2index[word] for word in sentence.split(' ')]
-
-
-
-
 
 # Return a list of indexes, one for each word in the sentence
 def indices_from_sentence(lang, sentence):

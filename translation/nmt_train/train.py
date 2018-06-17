@@ -235,7 +235,7 @@ def evaluate(encoder, decoder, sentence, max_length=MAX_LENGTH):
 
         return decoded_words, decoder_attentions[:di + 1]
 
-def evaluate(encoder, decoder, sentence, max_length=MAX_LENGTH):
+def evaluate(encoder, decoder, sentence, input_lang, output_lang, max_length=MAX_LENGTH):
     with torch.no_grad():
         input_tensor = tensor_from_sentence(input_lang, sentence, device)
         input_length = input_tensor.size()[0]
@@ -275,7 +275,7 @@ def evaluateRandomly(encoder, decoder, n=10):
         pair = random.choice(pairs)
         print('>', pair[0])
         print('=', pair[1])
-        output_words, attentions = evaluate(encoder, decoder, pair[0])
+        output_words, attentions = evaluate(encoder, decoder, pair[0], input_lang, output_lang)
         output_sentence = ' '.join(output_words)
         print('<', output_sentence)
         print('')
@@ -296,6 +296,7 @@ if __name__ == "__main__":
     np.random.seed(args.seed)
 
     input_lang, output_lang, pairs = prepare_data('fin', 'en', args.reverse)
+
     pairs = pairs[:10000] # We take only the first 10000 pairs for the proof of concept
     hidden_size = 512
     encoder1 = EncoderRNN(input_lang.n_words, hidden_size).to(device)
