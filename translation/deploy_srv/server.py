@@ -6,7 +6,6 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 import sys
-sys.path.insert(0, '../nmt_train/')
 from data_utils import prepare_data, unicode_to_ascii, normalize_string
 from train import EncoderRNN, AttnDecoderRNN, evaluate
 
@@ -17,7 +16,7 @@ STATUS_ERROR = "error"
 app = Flask(__name__)
 host="0.0.0.0"
 port=5000
-debug = True
+debug = False
 MAX_LENGTH=30
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -42,7 +41,8 @@ if __name__ == "__main__":
     global encoder_fi_en, attn_decoder_fi_en
     global encoder_en_fi, attn_decoder_en_fi
 
-    en_lang, fi_lang, _ = prepare_data('fin', 'en', reverse=False, main_dir='../nmt_train')
+    CORE_DIR = './'
+    en_lang, fi_lang, _ = prepare_data('fin', 'en', reverse=False)
 
     #Network parameters
     # Finnish -> English
@@ -51,16 +51,16 @@ if __name__ == "__main__":
     hidden_size = 512
     encoder_fi_en = EncoderRNN(fi_lang.n_words, hidden_size).to(device)
     attn_decoder_fi_en = AttnDecoderRNN(hidden_size, en_lang.n_words, dropout_p=0.1).to(device)
-    encoder_fi_en.load_state_dict(torch.load('../nmt_train/encoder_eng_fin.pt'))
-    attn_decoder_fi_en.load_state_dict(torch.load('../nmt_train/decoder_eng_fin.pt'))
+    encoder_fi_en.load_state_dict(torch.load('encoder_eng_fin.pt'))
+    attn_decoder_fi_en.load_state_dict(torch.load('decoder_eng_fin.pt'))
     encoder_fi_en.to("cuda")
     attn_decoder_fi_en.to("cuda")
     # English -> Finnish
     encoder_en_fi = EncoderRNN(en_lang.n_words, hidden_size).to(device)
     attn_decoder_en_fi = AttnDecoderRNN(hidden_size, fi_lang.n_words, dropout_p=0.1).to(device)
-    encoder_en_fi.load_state_dict(torch.load('../nmt_train/encoder_fin_eng.pt'))
-    attn_decoder_en_fi.load_state_dict(torch.load('../nmt_train/decoder_fin_eng.pt'))
+    encoder_en_fi.load_state_dict(torch.load('encoder_fin_eng.pt'))
+    attn_decoder_en_fi.load_state_dict(torch.load('decoder_fin_eng.pt'))
     encoder_en_fi.to("cuda")
     attn_decoder_en_fi.to("cuda")
 
-    app.run(debug=debug, host=host, port=port, use_reloader=False)
+    app.run(debug=debug, host=host, port=port)
