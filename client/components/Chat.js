@@ -41,6 +41,9 @@ class Chat extends Component {
       // When the new message comes, we just update the current state
       new_msg.user = {_id: msg.from === 'doc' ? 2: 1,
                       name:msg.from === 'doc' ? appointment.doc_name : appointment.patient_name};
+      if (msg.from !== 'doc'){
+        msg.text = msg.original_text;
+      }
       component.setState(previousState => ({
         messages: GiftedChat.append(previousState.messages, new_msg),
       }))

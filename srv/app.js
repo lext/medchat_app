@@ -205,14 +205,13 @@ const receiveMessage = function async (socket){
       const patient = patients_arr[client_data.patient_id];
       const client = await MongoClient.connect(url);
       const db = client.db("medchat");
-      // we create a new entry for the message and insert into the database
-      // TODO: We should use the translator here befor inserting !!! (probably some async / await stuff)
+
       response = await request('http://nmt_api:5000/translate', {
         method: 'POST',
         headers: {'content-type':'application/json'},
         data: JSON.stringify({src:client_data.text, direction:1})
       });
-      console.log(response);
+
       var processed_msg = {from:'doc',
         doc_id: new mongo.ObjectId(client_data.doc_id),
         patient_id: new mongo.ObjectId(client_data.patient_id),
@@ -238,10 +237,17 @@ const receiveMessage = function async (socket){
       const client = await MongoClient.connect(url);
       const db = client.db("medchat");
       // TODO: translation for the patient
+      response = await request('http://nmt_api:5000/translate', {
+        method: 'POST',
+        headers: {'content-type':'application/json'},
+        data: JSON.stringify({src:client_data.text, direction:0})
+      });
+
       var processed_msg = {from:'pat',
         doc_id: new mongo.ObjectId(client_data.doc_id),
         patient_id: new mongo.ObjectId(client_data.patient_id),
-        text:client_data.text,
+        original_text:client_data.text,
+        text:JSON.parse(response.body).tgt,
         appointment_id: new mongo.ObjectId(client_data.appointment_id),
         date:new Date(Date.now()).toISOString()
       };
