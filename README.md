@@ -1,4 +1,4 @@
-# MedChat: Oulu Health Hack 2018 winning solution
+# MedChat: Oulu Health Hack 2018 2nd winning solution
 
 ## Project idea
 This project is the second winning solution from Open Track @ Oulu Health Hack, June 15-17, 2018.
