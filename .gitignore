@@ -8,6 +8,18 @@ translation/nmt_train/fin-en.txt
 translation/nmt_train/.ipynb_checkpoints/
 translation/nmt_train/__pycache__/
 
+translation/deploy_srv/data_utils.py
+translation/deploy_srv/decoder_eng_fin.pt
+translation/deploy_srv/decoder_fin_eng.pt
+translation/deploy_srv/encoder_eng_fin.pt
+translation/deploy_srv/encoder_fin_eng.pt
+translation/deploy_srv/fin-en.txt
+translation/deploy_srv/train.py
+translation/nmt_train/decoder_eng_fin.pt
+translation/nmt_train/decoder_fin_eng.pt
+translation/nmt_train/encoder_eng_fin.pt
+translation/nmt_train/encoder_fin_eng.pt
+
 # built application files
 *.apk
 *.ap_
@@ -113,4 +125,3 @@ typings/
 
 # next.js build output
 .next
-
